@@ -283,50 +283,129 @@ def inject_dark_css():
 
 
 def render_top_navbar(current_page: str, pages: list, user: dict, plan: str, role: str, on_logout, on_role_change):
-    """Render modern top navigation bar."""
-    col1, col2, col3, col4 = st.columns([2, 3, 1.5, 1.5])
+    """Render professional top navigation bar with proper Streamlit layout."""
     
-    with col1:
-        st.markdown('<div class="navbar-brand">❤️ Heart Risk AI</div>', unsafe_allow_html=True)
+    # Create navbar container with proper styling
+    st.markdown("""
+    <div style="
+        background: linear-gradient(90deg, rgba(10, 15, 25, 0.95) 0%, rgba(20, 30, 50, 0.92) 100%);
+        border-bottom: 2px solid rgba(0, 212, 255, 0.4);
+        border-radius: 12px;
+        padding: 1.2rem 2rem;
+        margin: 0 0 2rem 0;
+        box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+        backdrop-filter: blur(10px);
+    ">
+    """, unsafe_allow_html=True)
     
-    with col2:
-        # Navigation items
-        cols = st.columns(len(pages))
-        for idx, page in enumerate(pages):
-            with cols[idx]:
-                is_active = current_page == page
-                if st.button(
-                    f"{'✓ ' if is_active else ''}{page}",
-                    key=f"nav_{page}",
-                    use_container_width=True,
-                ):
-                    st.session_state["current_page"] = page
-                    st.rerun()
+    # Header row with brand, search space, and user info
+    header_cols = st.columns([2, 3, 2])
     
-    with col3:
+    # Brand/Logo Column
+    with header_cols[0]:
+        st.markdown("""
+        <div style="
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        ">❤️ HeartRisk.AI</div>
+        """, unsafe_allow_html=True)
+    
+    # Middle spacer
+    with header_cols[1]:
+        pass
+    
+    # User info Column
+    with header_cols[2]:
         st.markdown(f"""
-        <div style="text-align: center; font-size: 0.85rem;">
-            <div style="color: #9ca3af;">Plan</div>
-            <div style="color: #00d4ff; font-weight: 600;">{plan}</div>
+        <div style="
+            text-align: right;
+            background: rgba(0, 212, 255, 0.05);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        ">
+            <div style="color: #9ca3af; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.5px;">USER PROFILE</div>
+            <div style="color: #00d4ff; font-weight: 700; font-size: 1rem; margin: 0.2rem 0;">{user.get('full_name', 'User')}</div>
+            <div style="color: #6b7280; font-size: 0.8rem;">📊 {plan} • 👤 {role}</div>
         </div>
         """, unsafe_allow_html=True)
     
-    with col4:
-        col_profile, col_logout = st.columns(2)
-        with col_profile:
-            st.markdown(f"""
-            <div style="text-align: center; font-size: 0.8rem;">
-                <div style="color: #9ca3af;">User</div>
-                <div style="color: #00d4ff; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    {user.get('full_name', 'User')[:15]}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+    # Navigation separator
+    st.markdown('<div style="height: 0.8rem;"></div>', unsafe_allow_html=True)
+    
+    # Navigation buttons row
+    nav_cols = st.columns([0.15] + [1.2] * len(pages) + [0.8])
+    
+    # Left spacing
+    with nav_cols[0]:
+        st.markdown('<div style="color: #00d4ff; font-size: 1.2rem; text-align: center;">🧭</div>')
+    
+    # Navigation buttons
+    for idx, page in enumerate(pages):
+        with nav_cols[idx + 1]:
+            is_active = current_page == page
+            
+            # Use HTML and CSS for proper button styling
+            if is_active:
+                st.markdown(f"""
+                <div style="
+                    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 153, 255, 0.2) 100%);
+                    border: 2px solid #00d4ff;
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    text-align: center;
+                    font-weight: 700;
+                    color: #00d4ff;
+                    font-size: 0.9rem;
+                    letter-spacing: 0.3px;
+                    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+                ">✓ {page}</div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div style="
+                    background: rgba(30, 45, 80, 0.4);
+                    border: 1px solid rgba(0, 212, 255, 0.2);
+                    border-radius: 8px;
+                    padding: 0.6rem 1rem;
+                    text-align: center;
+                    font-weight: 500;
+                    color: #d0d4dd;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                ">📍 {page}</div>
+                """, unsafe_allow_html=True)
+            
+            if st.button(
+                label="",
+                key=f"nav_{page}_{idx}",
+                use_container_width=True,
+                help=f"Navigate to {page} page"
+            ):
+                st.session_state["current_page"] = page
+                st.rerun()
+    
+    # Right action buttons column
+    with nav_cols[-1]:
+        col_logout, col_profile = st.columns(2)
         
         with col_logout:
-            if st.button("🚪", help="Logout", key="logout_btn"):
+            if st.button("🚪", key="logout_btn", help="Logout from the application", use_container_width=True):
                 on_logout()
                 st.rerun()
+        
+        with col_profile:
+            if st.button("⚙️", key="settings_btn", help="User settings", use_container_width=True):
+                pass  # Can be extended for settings page
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div style="margin-top: 0.5rem;"></div>', unsafe_allow_html=True)
 
 
 def risk_badge(label: str) -> str:
