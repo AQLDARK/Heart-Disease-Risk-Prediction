@@ -343,7 +343,7 @@ def render_top_navbar(current_page: str, pages: list, user: dict, plan: str, rol
     
     # Left spacing
     with nav_cols[0]:
-        st.markdown('<div style="color: #00d4ff; font-size: 1.2rem; text-align: center;">🧭</div>')
+        pass
     
     # Navigation buttons
     for idx, page in enumerate(pages):
