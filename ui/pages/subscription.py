@@ -8,7 +8,6 @@ from ml.storage import (
     get_user_transactions,
     get_plan_features
 )
-from ml.utils import generate_pdf_report
 from ui.components import card, info_box, divider, stat_card
 import uuid
 
