@@ -346,7 +346,17 @@ def update_user_profile(user_id, full_name=None, profession=None, hospital_clini
         
         if role is not None:
             updates.append("role = ?")
-            values.append(role.capitalize())
+            # Properly format role names
+            if role.lower() == 'doctor':
+                values.append('Doctor')
+            elif role.lower() == 'patient':
+                values.append('Patient')
+            elif role.lower() == 'researcher':
+                values.append('Researcher')
+            elif role.lower() == 'administrator':
+                values.append('Administrator')
+            else:
+                values.append(role.capitalize())
         
         if not updates:
             return True

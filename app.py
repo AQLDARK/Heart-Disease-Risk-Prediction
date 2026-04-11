@@ -53,7 +53,8 @@ def main():
             return
             
         user_id = user.get("user_id")
-        role = st.session_state.get("current_role", user.get("role", "Patient"))
+        # Get role from session state (updated by profile page) or from user data
+        role = st.session_state.get("role", st.session_state.get("current_role", user.get("role", "Patient")))
         plan = get_subscription_for_user(user_id) if user_id else "Free"
     except Exception as e:
         logger.error(f"Failed to retrieve user info: {e}")
@@ -69,10 +70,12 @@ def main():
     # ✅ Page list depends on role
     if role == "Patient":
         pages = ["Predict", "Explainability", "Subscription & Billing", "Profile", "About"]
-    elif role == "Clinician / Staff":
+    elif role == "Clinician / Staff" or role == "Doctor":
         pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
-    else:
+    elif role == "Administrator":
         pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Subscription & Billing", "Profile", "About"]
+    else:
+        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
 
     current_page = st.session_state.get("current_page", "Predict")
     
@@ -109,17 +112,18 @@ def main():
                 st.info("Go to **Subscription & Billing** to upgrade.")
 
         elif current_page == "Admin Dashboard":
-            if role == "Administrator" and plan == "Premium":
+            if role == "Administrator":
                 render_admin_dashboard()
             else:
-                st.warning("🔒 Admin Analytics is available only for Administrators on the **Premium** plan.")
-                st.info("Go to **Subscription & Billing** to upgrade.")
+                st.warning("🔒 Admin Dashboard is available only for Administrators.")
+                st.info("Go to **Profile** to change your role to Administrator.")
 
         elif current_page == "Model Performance":
             if role == "Administrator":
                 render_performance_page()
             else:
                 st.warning("🔒 Model Performance is available only for Administrators.")
+                st.info("Go to **Profile** to change your role to Administrator.")
 
         elif current_page == "Subscription & Billing":
             render_subscription_page()

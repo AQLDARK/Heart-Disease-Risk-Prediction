@@ -97,7 +97,7 @@ def profile():
         
         current_role = st.session_state.get('role', 'patient')
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             if st.button(
@@ -107,8 +107,12 @@ def profile():
             ):
                 try:
                     update_user_profile(user_id=user.get('id'), role='doctor')
-                    st.session_state["role"] = 'doctor'
-                    info_box("Role changed to Doctor", color="success")
+                    # Fetch updated user data from database
+                    updated_user = get_user_by_id(user.get('id'))
+                    st.session_state["user"] = {**st.session_state["user"], **updated_user} if updated_user else st.session_state["user"]
+                    st.session_state["role"] = 'Doctor'
+                    st.session_state["current_role"] = 'Doctor'
+                    info_box("✅ Role changed to Doctor", color="success")
                     st.rerun()
                 except Exception as e:
                     info_box(f"Error changing role: {str(e)}", color="error")
@@ -121,8 +125,12 @@ def profile():
             ):
                 try:
                     update_user_profile(user_id=user.get('id'), role='patient')
-                    st.session_state["role"] = 'patient'
-                    info_box("Role changed to Patient", color="success")
+                    # Fetch updated user data from database
+                    updated_user = get_user_by_id(user.get('id'))
+                    st.session_state["user"] = {**st.session_state["user"], **updated_user} if updated_user else st.session_state["user"]
+                    st.session_state["role"] = 'Patient'
+                    st.session_state["current_role"] = 'Patient'
+                    info_box("✅ Role changed to Patient", color="success")
                     st.rerun()
                 except Exception as e:
                     info_box(f"Error changing role: {str(e)}", color="error")
@@ -135,8 +143,30 @@ def profile():
             ):
                 try:
                     update_user_profile(user_id=user.get('id'), role='researcher')
-                    st.session_state["role"] = 'researcher'
-                    info_box("Role changed to Researcher", color="success")
+                    # Fetch updated user data from database
+                    updated_user = get_user_by_id(user.get('id'))
+                    st.session_state["user"] = {**st.session_state["user"], **updated_user} if updated_user else st.session_state["user"]
+                    st.session_state["role"] = 'Researcher'
+                    st.session_state["current_role"] = 'Researcher'
+                    info_box("✅ Role changed to Researcher", color="success")
+                    st.rerun()
+                except Exception as e:
+                    info_box(f"Error changing role: {str(e)}", color="error")
+        
+        with col4:
+            if st.button(
+                "🛡️\nAdmin",
+                use_container_width=True,
+                key="role_admin"
+            ):
+                try:
+                    update_user_profile(user_id=user.get('id'), role='administrator')
+                    # Fetch updated user data from database
+                    updated_user = get_user_by_id(user.get('id'))
+                    st.session_state["user"] = {**st.session_state["user"], **updated_user} if updated_user else st.session_state["user"]
+                    st.session_state["role"] = 'Administrator'
+                    st.session_state["current_role"] = 'Administrator'
+                    info_box("✅ Role changed to Administrator", color="success")
                     st.rerun()
                 except Exception as e:
                     info_box(f"Error changing role: {str(e)}", color="error")
@@ -150,7 +180,8 @@ def profile():
         roles_info = {
             "👨‍⚕️ Doctor": "Access to advanced diagnostics, patient history, and detailed reports. Full feature set for medical professionals.",
             "👤 Patient": "Personal risk assessment, health tracking, and basic health recommendations.",
-            "👨‍💻 Researcher": "Advanced analytics, model insights, data export, and research tools."
+            "👨‍💻 Researcher": "Advanced analytics, model insights, data export, and research tools.",
+            "🛡️ Administrator": "Full system access, admin dashboard, model performance analytics, and user management."
         }
         
         for role_name, description in roles_info.items():
