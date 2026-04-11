@@ -46,13 +46,14 @@ def inject_dark_css():
             background: rgba(10, 15, 25, 0.8);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 1rem 1.5rem;
+            padding: 2rem 1.5rem;
             position: sticky;
             top: 0;
             z-index: 999;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 2rem;
         }
         
         .navbar-brand {
