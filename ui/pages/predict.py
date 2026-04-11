@@ -1,17 +1,26 @@
 import streamlit as st
 import pandas as pd
+import logging
 
 from ml.utils import load_json
 from ml.predict import predict_risk
+from ml.validation import ValidationError
 from ui.components import risk_badge
 from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
+
+logger = logging.getLogger(__name__)
 
 
 def render_predict_page(plan='Free'):
     st.subheader("Predict")
 
-    schema = load_json("models/feature_schema.json")
+    try:
+        schema = load_json("models/feature_schema.json")
+    except Exception as e:
+        st.error(f"Failed to load model schema: {e}")
+        logger.error(f"Schema loading error: {e}")
+        return
 
     # Persist values across reruns (Streamlit reruns top-to-bottom)
     if "latest_proba" not in st.session_state:
@@ -52,32 +61,45 @@ def render_predict_page(plan='Free'):
         st.markdown("### Results")
 
         if submitted:
-            out = predict_risk(user_dict, schema)
-            p = float(out["proba"])          # ensure numeric for formatting
-            label = out["label"]
+            try:
+                out = predict_risk(user_dict, schema)
+                p = float(out["proba"])          # ensure numeric for formatting
+                label = out["label"]
 
-            st.session_state["latest_proba"] = p
-            st.session_state["latest_label"] = label
-            st.session_state["latest_out"] = out
+                st.session_state["latest_proba"] = p
+                st.session_state["latest_label"] = label
+                st.session_state["latest_out"] = out
 
-            pdf_bytes = generate_patient_report_pdf(
-                patient_data=user_dict,
-                probability=p,
-                label=label,
-                shap_top_drivers=None
-            )
+                try:
+                    pdf_bytes = generate_patient_report_pdf(
+                        patient_data=user_dict,
+                        probability=p,
+                        label=label,
+                        shap_top_drivers=None
+                    )
 
-            if plan == "Premium":
-                st.download_button(
-                    label="Download PDF Report",
-                    data=pdf_bytes,
-                    file_name="heart_risk_report.pdf",
-                    mime="application/pdf"
-                )
-            else:
-                st.info("🔒 PDF reports are available on the **Premium** plan. Upgrade in **Subscription & Billing**.")
-
-            
+                    if plan == "Premium":
+                        st.download_button(
+                            label="Download PDF Report",
+                            data=pdf_bytes,
+                            file_name="heart_risk_report.pdf",
+                            mime="application/pdf"
+                        )
+                    else:
+                        st.info("🔒 PDF reports are available on the **Premium** plan. Upgrade in **Subscription & Billing**.")
+                except Exception as e:
+                    logger.error(f"PDF generation failed: {e}")
+                    st.warning(f"PDF report generation failed: {e}")
+                    
+            except ValidationError as e:
+                st.error(f"❌ Input validation error: {e}")
+                logger.warning(f"Validation error: {e}")
+            except RuntimeError as e:
+                st.error(f"❌ Prediction failed: {e}")
+                logger.error(f"Prediction error: {e}")
+            except Exception as e:
+                st.error(f"❌ An unexpected error occurred: {e}")
+                logger.error(f"Unexpected error in prediction: {e}")
 
         # Show results if we have them (after submit, and also persists on rerun)
         p = st.session_state.get("latest_proba", None)
@@ -95,7 +117,12 @@ def render_predict_page(plan='Free'):
 
             save_to_history = st.checkbox("Save this prediction to history", value=True)
             if save_to_history:
-                save_prediction(user_dict, p, label)
-                st.success("Saved to prediction history.")
+                try:
+                    save_prediction(user_dict, p, label)
+                    st.success("✅ Saved to prediction history.")
+                    logger.info(f"Prediction saved for user")
+                except Exception as e:
+                    st.warning(f"Could not save to history: {e}")
+                    logger.error(f"Failed to save prediction: {e}")
         else:
             st.info("Fill the form and click **Predict Risk** to see results.")
