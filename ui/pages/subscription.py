@@ -81,7 +81,7 @@ def generate_invoice_pdf(user, transaction, plan_features):
         
         service_data = [
             ['Description', 'Amount', 'Currency', 'Total'],
-            [f"{transaction.get('plan', 'N/A')} Plan (Monthly)', '$' + str(transaction.get('amount', 0)), 
+            [f"{transaction.get('plan', 'N/A')} Plan (Monthly)", '$' + str(transaction.get('amount', 0)), 
              transaction.get('currency', 'USD'), '$' + str(transaction.get('amount', 0))],
         ]
         
