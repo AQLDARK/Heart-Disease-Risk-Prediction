@@ -349,41 +349,10 @@ def render_top_navbar(current_page: str, pages: list, user: dict, plan: str, rol
     for idx, page in enumerate(pages):
         with nav_cols[idx + 1]:
             is_active = current_page == page
-            
-            # Use HTML and CSS for proper button styling
-            if is_active:
-                st.markdown(f"""
-                <div style="
-                    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 153, 255, 0.2) 100%);
-                    border: 2px solid #00d4ff;
-                    border-radius: 8px;
-                    padding: 0.6rem 1rem;
-                    text-align: center;
-                    font-weight: 700;
-                    color: #00d4ff;
-                    font-size: 0.9rem;
-                    letter-spacing: 0.3px;
-                    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
-                ">✓ {page}</div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown(f"""
-                <div style="
-                    background: rgba(30, 45, 80, 0.4);
-                    border: 1px solid rgba(0, 212, 255, 0.2);
-                    border-radius: 8px;
-                    padding: 0.6rem 1rem;
-                    text-align: center;
-                    font-weight: 500;
-                    color: #d0d4dd;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                ">📍 {page}</div>
-                """, unsafe_allow_html=True)
+            button_label = f"✓ {page}" if is_active else f"📍 {page}"
             
             if st.button(
-                label="",
+                label=button_label,
                 key=f"nav_{page}_{idx}",
                 use_container_width=True,
                 help=f"Navigate to {page} page"
