@@ -5,7 +5,7 @@ import logging
 from ml.utils import load_json
 from ml.predict import predict_risk
 from ml.validation import ValidationError
-from ui.components import risk_badge, section_header, metric_card
+from ui.components import risk_badge, stat_card, card, divider, info_box
 from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
 
@@ -13,9 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 def render_predict_page(plan='Free'):
-    section_header("🔍 Risk Prediction")
-    st.markdown("**Enter patient information to predict cardiovascular disease risk**")
-    st.divider()
+    st.markdown("## 🔬 Risk Prediction")
+    st.markdown("*Enter patient information to assess heart disease risk*")
 
     try:
         schema = load_json("models/feature_schema.json")
@@ -32,102 +31,111 @@ def render_predict_page(plan='Free'):
     if "latest_out" not in st.session_state:
         st.session_state["latest_out"] = None
 
-    col_left, col_right = st.columns([1.2, 1], gap="large")
+    col_left, col_right = st.columns([1.2, 1.2], gap="large")
 
     with col_left:
-        st.markdown("### 👤 Patient Information")
-        with st.form("patient_form"):
-            col1, col2 = st.columns(2)
-            with col1:
-                age = st.number_input("Age", min_value=1, max_value=120, value=45)
-                sex = st.selectbox("Sex", ["Female (0)", "Male (1)"], index=1)
-                sex_val = 1 if sex == "Male (1)" else 0
-                
-                cp = st.selectbox("Chest Pain Type", 
-                                 ["Typical Angina (0)", "Atypical Angina (1)", "Non-anginal Pain (2)", "Asymptomatic (3)"], 
-                                 index=1)
-                cp_val = int(cp.split("(")[1].strip(")"))
-                
-                trestbps = st.number_input("Resting BP (mmHg)", min_value=50, max_value=250, value=130)
-                chol = st.number_input("Cholesterol (mg/dl)", min_value=50, max_value=600, value=240)
+        st.markdown("### 📋 Patient Data")
+        with st.form("patient_form", border=True):
+            # Demographics
+            st.markdown("**👤 Age & Sex**")
+            col_a1, col_a2 = st.columns(2)
+            with col_a1:
+                age = st.number_input("Age (years)", min_value=1, max_value=120, value=45)
+            with col_a2:
+                sex = st.selectbox("Sex", ["Female", "Male"], index=1)
+                sex_val = 0 if sex == "Female" else 1
             
-            with col2:
-                fbs = st.selectbox("Fasting Blood Sugar > 120 mg/dl", ["No (0)", "Yes (1)"], index=0)
-                fbs_val = 1 if fbs == "Yes (1)" else 0
-                
-                restecg = st.selectbox("Resting ECG", 
-                                      ["Normal (0)", "ST-T Abnormality (1)", "LV Hypertrophy (2)"], 
-                                      index=0)
-                restecg_val = int(restecg.split("(")[1].strip(")"))
-                
-                thalach = st.number_input("Max Heart Rate", min_value=50, max_value=250, value=150)
-                exang = st.selectbox("Exercise Induced Angina", ["No (0)", "Yes (1)"], index=0)
-                exang_val = 1 if exang == "Yes (1)" else 0
+            st.divider()
             
-            col1, col2 = st.columns(2)
-            with col1:
+            # Vitals
+            st.markdown("**💓 Vital Signs**")
+            col_v1, col_v2 = st.columns(2)
+            with col_v1:
+                trestbps = st.number_input("BP (mmHg)", min_value=50, max_value=250, value=130)
+            with col_v2:
+                chol = st.number_input("Cholesterol (mg/dL)", min_value=50, max_value=600, value=240)
+            
+            col_v3, col_v4 = st.columns(2)
+            with col_v3:
+                thalach = st.number_input("Max HR (bpm)", min_value=50, max_value=250, value=150)
+            with col_v4:
                 oldpeak = st.number_input("ST Depression", min_value=0.0, max_value=10.0, value=1.0, step=0.1)
-                slope = st.selectbox("ST Slope", ["Upsloping (0)", "Flat (1)", "Downsloping (2)"], index=1)
-                slope_val = int(slope.split("(")[1].strip(")"))
             
-            with col2:
-                ca = st.selectbox("Major Vessels (0-3)", [0, 1, 2, 3], index=0)
-                thal = st.selectbox("Thalassemia", ["Normal (0)", "Fixed Defect (1)", "Reversible Defect (2)", "Severe (3)"], index=2)
-                thal_val = int(thal.split("(")[1].strip(")"))
+            st.divider()
+            
+            # Clinical Indicators
+            st.markdown("**🔬 Clinical Indicators**")
+            col_c1, col_c2, col_c3 = st.columns(3)
+            with col_c1:
+                cp = st.selectbox("Chest Pain", [0, 1, 2, 3], index=1, help="Angina type (0-3)")
+            with col_c2:
+                exang = st.selectbox("Exercise Angina", [0, 1], index=0, help="0=No, 1=Yes")
+            with col_c3:
+                fbs = st.selectbox("Fasting BS", [0, 1], index=0, help=">120 mg/dL?")
+            
+            col_c4, col_c5, col_c6 = st.columns(3)
+            with col_c4:
+                restecg = st.selectbox("Rest ECG", [0, 1, 2], index=0)
+            with col_c5:
+                slope = st.selectbox("ST Slope", [0, 1, 2], index=1)
+            with col_c6:
+                ca = st.selectbox("Vessels", [0, 1, 2, 3], index=0, help="Calcified")
+            
+            st.markdown("**🧬 Additional**")
+            thal = st.selectbox("Thalassemia Type", [0, 1, 2, 3], index=2)
 
             submitted = st.form_submit_button("🚀 Predict Risk", use_container_width=True)
 
         user_dict = {
-            "age": age, "sex": sex_val, "cp": cp_val, "trestbps": trestbps, "chol": chol,
-            "fbs": fbs_val, "restecg": restecg_val, "thalach": thalach, "exang": exang_val,
-            "oldpeak": oldpeak, "slope": slope_val, "ca": ca, "thal": thal_val
+            "age": age, "sex": sex_val, "cp": cp, "trestbps": trestbps, "chol": chol,
+            "fbs": fbs, "restecg": restecg, "thalach": thalach, "exang": exang,
+            "oldpeak": oldpeak, "slope": slope, "ca": ca, "thal": thal
         }
 
     with col_right:
-        st.markdown("### 📊 Prediction Results")
-        
+        st.markdown("### 📊 Results")
+
         if submitted:
-            with st.spinner("Analyzing patient data..."):
+            try:
+                out = predict_risk(user_dict, schema)
+                p = float(out["proba"])
+                label = out["label"]
+
+                st.session_state["latest_proba"] = p
+                st.session_state["latest_label"] = label
+                st.session_state["latest_out"] = out
+
                 try:
-                    out = predict_risk(user_dict, schema)
-                    p = float(out["proba"])
-                    label = out["label"]
+                    pdf_bytes = generate_patient_report_pdf(
+                        patient_data=user_dict,
+                        probability=p,
+                        label=label,
+                        shap_top_drivers=None
+                    )
 
-                    st.session_state["latest_proba"] = p
-                    st.session_state["latest_label"] = label
-                    st.session_state["latest_out"] = out
-
-                    try:
-                        pdf_bytes = generate_patient_report_pdf(
-                            patient_data=user_dict,
-                            probability=p,
-                            label=label,
-                            shap_top_drivers=None
+                    if plan == "Premium":
+                        st.download_button(
+                            label="📄 Download PDF Report",
+                            data=pdf_bytes,
+                            file_name="heart_risk_report.pdf",
+                            mime="application/pdf",
+                            use_container_width=True
                         )
-
-                        if plan == "Premium":
-                            st.download_button(
-                                label="📥 Download PDF Report",
-                                data=pdf_bytes,
-                                file_name="heart_risk_report.pdf",
-                                mime="application/pdf",
-                                use_container_width=True
-                            )
-                        else:
-                            st.info("🔒 PDF reports are available on the **Premium** plan. Upgrade in **Subscription & Billing**.")
-                    except Exception as e:
-                        logger.error(f"PDF generation failed: {e}")
-                        st.warning(f"PDF report generation failed: {e}")
-                        
-                except ValidationError as e:
-                    st.error(f"❌ Input validation error: {e}")
-                    logger.warning(f"Validation error: {e}")
-                except RuntimeError as e:
-                    st.error(f"❌ Prediction failed: {e}")
-                    logger.error(f"Prediction error: {e}")
+                    else:
+                        info_box("PDF reports available on Premium plan", "warning")
                 except Exception as e:
-                    st.error(f"❌ An unexpected error occurred: {e}")
-                    logger.error(f"Unexpected error in prediction: {e}")
+                    logger.error(f"PDF generation failed: {e}")
+                    st.warning(f"PDF generation failed: {e}")
+                    
+            except ValidationError as e:
+                info_box(f"Validation error: {e}", "error")
+                logger.warning(f"Validation error: {e}")
+            except RuntimeError as e:
+                info_box(f"Prediction failed: {e}", "error")
+                logger.error(f"Prediction error: {e}")
+            except Exception as e:
+                info_box(f"Unexpected error: {e}", "error")
+                logger.error(f"Unexpected error: {e}")
 
         # Show results if we have them
         p = st.session_state.get("latest_proba", None)
@@ -135,57 +143,51 @@ def render_predict_page(plan='Free'):
         out = st.session_state.get("latest_out", None)
 
         if p is not None and label is not None and out is not None:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
             
+            # Show risk metrics
             col1, col2 = st.columns(2)
             with col1:
-                st.metric("Risk Probability", f"{p*100:.1f}%", delta=None)
+                st.markdown(f"""
+                <div class="metric">
+                    <div class="metric-label">Risk Probability</div>
+                    <div class="metric-value">{p*100:.1f}%</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
             with col2:
-                st.markdown(f"**Risk Level:** {risk_badge(label)}", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="metric">
+                    <div class="metric-label">Risk Level</div>
+                    <div style="font-size: 1.5rem; margin-top: 0.3rem;">
+                        {risk_badge(label)}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
             
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
             
-            st.caption("⚕️ Disclaimer: This is a decision-support tool, not a medical diagnosis.")
-
-            # Store for Explainability page
+            # Store for explainability page
             st.session_state["latest_input"] = user_dict
             st.session_state["latest_clean_df"] = out["cleaned_df"]
 
-            st.divider()
-            save_to_history = st.checkbox("💾 Save prediction to history", value=True)
+            # Save option
+            col_save1, col_save2 = st.columns([3, 1])
+            with col_save1:
+                save_to_history = st.checkbox("💾 Save to history")
+            with col_save2:
+                pass
+            
             if save_to_history:
                 try:
                     save_prediction(user_dict, p, label)
-                    st.success("✅ Saved to prediction history.")
-                    logger.info(f"Prediction saved")
+                    info_box("Prediction saved to history", "success")
+                    logger.info("Prediction saved")
                 except Exception as e:
-                    st.warning(f"Could not save to history: {e}")
+                    info_box(f"Could not save: {e}", "warning")
                     logger.error(f"Failed to save prediction: {e}")
+            
+            st.markdown("---")
+            st.markdown("ℹ️ *This is a decision-support tool, not a medical diagnosis.*")
         else:
-            st.info("Fill the form and click **Predict Risk** to see results.")
-
-        # Show results if we have them (after submit, and also persists on rerun)
-        p = st.session_state.get("latest_proba", None)
-        label = st.session_state.get("latest_label", None)
-        out = st.session_state.get("latest_out", None)
-
-        if p is not None and label is not None and out is not None:
-            st.metric("Risk Probability", f"{p:.2f}")
-            st.markdown(f"**Risk Label:** {risk_badge(label)}")
-            st.caption("Disclaimer: This is a decision-support tool, not a medical diagnosis.")
-
-            # Store latest prediction in session for Explainability page
-            st.session_state["latest_input"] = user_dict
-            st.session_state["latest_clean_df"] = out["cleaned_df"]
-
-            save_to_history = st.checkbox("Save this prediction to history", value=True)
-            if save_to_history:
-                try:
-                    save_prediction(user_dict, p, label)
-                    st.success("✅ Saved to prediction history.")
-                    logger.info(f"Prediction saved for user")
-                except Exception as e:
-                    st.warning(f"Could not save to history: {e}")
-                    logger.error(f"Failed to save prediction: {e}")
-        else:
-            st.info("Fill the form and click **Predict Risk** to see results.")
+            st.info("👆 Fill the form and click **Predict Risk** to see results.")

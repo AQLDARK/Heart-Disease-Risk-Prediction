@@ -6,15 +6,12 @@ import joblib
 
 from ml.utils import load_json
 from ml.explain import build_explainer, explain_one, top_drivers
-from ui.components import section_header
 
 def render_explain_page():
-    section_header("🧠 Model Explainability")
-    st.markdown("**Understand why the model made its prediction using SHAP analysis**")
-    st.divider()
+    st.subheader("Explainability")
 
     if "latest_input" not in st.session_state:
-        st.warning("⚠️ Make a prediction first (Predict tab).")
+        st.warning("Make a prediction first (Predict tab).")
         return
 
     schema = load_json("models/feature_schema.json")

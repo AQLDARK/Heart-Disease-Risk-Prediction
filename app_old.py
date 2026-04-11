@@ -3,7 +3,7 @@ import logging
 
 from ml.logger import setup_logging, get_logger
 from ml.storage import init_db, get_subscription, get_subscription_for_user
-from ui.components import inject_dark_css, render_top_navbar
+from ui.components import inject_dark_css
 
 from ui.pages.predict import render_predict_page
 from ui.pages.explain import render_explain_page
@@ -20,16 +20,6 @@ logger = get_logger(__name__)
 
 
 def main():
-    # Set page config at the very start
-    st.set_page_config(
-        page_title="Heart Disease Risk Prediction System",
-        layout="wide",
-        initial_sidebar_state="collapsed"
-    )
-    
-    # Apply CSS immediately
-    inject_dark_css()
-    
     try:
         init_db()
     except Exception as e:
@@ -52,7 +42,7 @@ def main():
             return
             
         user_id = user.get("user_id")
-        role = st.session_state.get("current_role", user.get("role", "Patient"))
+        role = user.get("role", "Patient")
         plan = get_subscription_for_user(user_id) if user_id else "Free"
     except Exception as e:
         logger.error(f"Failed to retrieve user info: {e}")
@@ -61,11 +51,26 @@ def main():
         st.rerun()
         return
 
-    # Initialize current_page in session state
-    if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "Predict"
+    st.set_page_config(page_title="Heart Disease Risk Prediction System", layout="wide")
+    inject_dark_css()
 
-    # ✅ Page list depends on role
+    st.title("Heart Disease Risk Prediction System")
+    st.caption("Decision-support dashboard — not a medical diagnosis.")
+
+    # ✅ Sidebar
+    st.sidebar.title("Access Control")
+    role = st.sidebar.selectbox("Select role", ["Patient", "Clinician / Staff", "Administrator"], 
+                                index=["Patient", "Clinician / Staff", "Administrator"].index(role))
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(f"**Subscription Plan:** `{plan}`")
+    st.sidebar.markdown("Upgrade to unlock more features.")
+    st.sidebar.markdown(f"**Logged in as:** {user.get('full_name', 'Unknown')}")
+    if st.sidebar.button("Logout"):
+        st.session_state.clear()
+        logger.info(f"User {user.get('email', 'unknown')} logged out")
+        st.rerun()
+
+    # ✅ Page list depends on role (platform feel)
     if role == "Patient":
         pages = ["Predict", "Explainability", "Subscription & Billing", "About"]
     elif role == "Clinician / Staff":
@@ -73,62 +78,42 @@ def main():
     else:
         pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Subscription & Billing", "About"]
 
-    current_page = st.session_state.get("current_page", "Predict")
-    
-    # Handle logout
-    def on_logout():
-        st.session_state.clear()
-        logger.info(f"User {user.get('email', 'unknown')} logged out")
-    
-    def on_role_change(new_role):
-        st.session_state["current_role"] = new_role
-        st.rerun()
+    page = st.sidebar.radio("Navigate", pages)
 
-    # Render top navigation
-    st.markdown("")  # Small spacing
-    render_top_navbar(current_page, pages, user, plan, role, on_logout, on_role_change)
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    
-    # Main content area
-    st.markdown("")  # Spacing
-    
     try:
         # ✅ Routing + Restrictions
-        if current_page == "Predict":
+        if page == "Predict":
             render_predict_page(plan=plan)
 
-        elif current_page == "Explainability":
+        elif page == "Explainability":
             render_explain_page()
 
-        elif current_page == "History":
+        elif page == "History":
             if plan in ["Standard", "Premium"]:
                 render_history_page()
             else:
                 st.warning("🔒 History is available on **Standard** or **Premium** plans.")
                 st.info("Go to **Subscription & Billing** to upgrade.")
 
-        elif current_page == "Admin Dashboard":
-            if role == "Administrator" and plan == "Premium":
+        elif page == "Admin Dashboard":
+            if plan == "Premium":
                 render_admin_dashboard()
             else:
-                st.warning("🔒 Admin Analytics is available only for Administrators on the **Premium** plan.")
+                st.warning("🔒 Admin Analytics is available only on the **Premium** plan.")
                 st.info("Go to **Subscription & Billing** to upgrade.")
 
-        elif current_page == "Model Performance":
-            if role == "Administrator":
-                render_performance_page()
-            else:
-                st.warning("🔒 Model Performance is available only for Administrators.")
+        elif page == "Model Performance":
+            render_performance_page()
 
-        elif current_page == "Subscription & Billing":
+        elif page == "Subscription & Billing":
             render_subscription_page()
             st.info("After selecting a plan, refresh the page or re-open the app if needed.")
 
-        elif current_page == "About":
+        elif page == "About":
             render_about_page()
             
     except Exception as e:
-        logger.error(f"Error rendering page '{current_page}': {e}")
+        logger.error(f"Error rendering page '{page}': {e}")
         st.error(f"An error occurred on this page: {e}")
 
 
