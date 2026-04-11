@@ -1,9 +1,10 @@
 import argparse
 import json
 from pathlib import Path
+import numpy as np
+import shap
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -18,7 +19,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-
+from ml.utils import save_json, group_shap_features
 from ml.utils import save_json
 
 DEFAULT_FEATURES = [
@@ -27,6 +28,45 @@ DEFAULT_FEATURES = [
 ]
 
 TARGET_COLS = ["target", "num", "output", "HeartDisease", "heart_disease"]
+
+
+def compute_global_shap(preprocess, model, X_train_df, max_samples=200):
+    """
+    Returns a dict: {feature_name: mean_abs_shap_value}
+    Computed on transformed feature space (after one-hot/scaling).
+    """
+    # sample for speed
+    X_sample_df = X_train_df.sample(min(max_samples, len(X_train_df)), random_state=42)
+
+    # transform to model input space
+    X_trans = preprocess.transform(X_sample_df)
+
+    # feature names after preprocessing (includes one-hot expanded names)
+    try:
+        feature_names = preprocess.get_feature_names_out().tolist()
+    except Exception:
+        feature_names = [f"f{i}" for i in range(X_trans.shape[1])]
+
+    # background for SHAP
+    bg = X_trans[: min(100, X_trans.shape[0])]
+
+    # choose explainer type
+    is_tree_like = hasattr(model, "feature_importances_") or "forest" in model.__class__.__name__.lower()
+    if is_tree_like:
+        explainer = shap.TreeExplainer(model)
+        shap_vals = explainer.shap_values(X_trans)
+        # For binary classification, shap_values can be list [class0, class1]
+        if isinstance(shap_vals, list):
+            shap_vals = shap_vals[1]
+    else:
+        explainer = shap.Explainer(model, bg)
+        shap_exp = explainer(X_trans)
+        shap_vals = shap_exp.values
+
+    mean_abs = np.mean(np.abs(shap_vals), axis=0)
+
+    # convert to dict
+    return dict(zip(feature_names, mean_abs.astype(float)))
 
 def pick_target_column(df: pd.DataFrame) -> str:
     # 1) direct matches
@@ -158,6 +198,12 @@ def main(csv_path: str, out_dir: str):
         "numeric_features": numeric_features,
         "categorical_features": categorical_features
     }
+    global_shap = compute_global_shap(fitted_preprocess, fitted_model, X_train)
+    save_json(global_shap, out / "global_shap.json")
+
+    grouped = group_shap_features(global_shap)
+    save_json(grouped, out / "global_shap_grouped.json")
+
     save_json(schema, out / "feature_schema.json")
 
     metrics_payload = {
