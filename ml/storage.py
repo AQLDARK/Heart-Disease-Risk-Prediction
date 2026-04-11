@@ -53,6 +53,23 @@ def init_db():
         )
     """)
 
+    # 2.5) Transactions table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            plan TEXT NOT NULL,
+            amount REAL NOT NULL,
+            currency TEXT DEFAULT 'USD',
+            status TEXT NOT NULL,
+            payment_method TEXT,
+            transaction_id TEXT UNIQUE,
+            created_at TEXT NOT NULL,
+            invoice_id TEXT UNIQUE,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    """)
+
     # 3) Predictions table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
@@ -403,4 +420,106 @@ def get_user_by_id(user_id):
     except Exception as e:
         logger.error(f"Error fetching user by ID: {str(e)}")
         return None
-    conn.close()
+
+
+def record_transaction(user_id, plan, amount, payment_method, status="completed"):
+    """Record a transaction for plan upgrade."""
+    try:
+        from datetime import datetime
+        import uuid
+        
+        conn = get_conn()
+        cur = conn.cursor()
+        
+        transaction_id = str(uuid.uuid4())
+        invoice_id = f"INV-{user_id}-{int(datetime.now().timestamp())}"
+        
+        cur.execute("""
+            INSERT INTO transactions (user_id, plan, amount, payment_method, status, transaction_id, invoice_id, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (user_id, plan, amount, payment_method, status, transaction_id, invoice_id, datetime.now().isoformat()))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Transaction recorded: {transaction_id} for user {user_id}")
+        return {"transaction_id": transaction_id, "invoice_id": invoice_id}
+    except Exception as e:
+        logger.error(f"Error recording transaction: {str(e)}")
+        raise
+
+
+def get_user_transactions(user_id):
+    """Get all transactions for a user."""
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT id, plan, amount, currency, status, payment_method, transaction_id, created_at, invoice_id
+            FROM transactions
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        """, (user_id,))
+        
+        rows = cur.fetchall()
+        conn.close()
+        
+        transactions = []
+        for row in rows:
+            transactions.append({
+                "id": row[0],
+                "plan": row[1],
+                "amount": row[2],
+                "currency": row[3],
+                "status": row[4],
+                "payment_method": row[5],
+                "transaction_id": row[6],
+                "created_at": row[7],
+                "invoice_id": row[8]
+            })
+        
+        return transactions
+    except Exception as e:
+        logger.error(f"Error fetching transactions: {str(e)}")
+        return []
+
+
+def get_plan_features(plan):
+    """Get features available for a given plan."""
+    features = {
+        "Free": {
+            "price": 0,
+            "predictions_per_month": 10,
+            "history": False,
+            "export": False,
+            "explainability": False,
+            "admin_dashboard": False,
+            "advanced_reports": False,
+            "api_access": False,
+            "support": "Community"
+        },
+        "Standard": {
+            "price": 9.99,
+            "predictions_per_month": 100,
+            "history": True,
+            "export": True,
+            "explainability": True,
+            "admin_dashboard": False,
+            "advanced_reports": False,
+            "api_access": False,
+            "support": "Email"
+        },
+        "Premium": {
+            "price": 29.99,
+            "predictions_per_month": float('inf'),
+            "history": True,
+            "export": True,
+            "explainability": True,
+            "admin_dashboard": True,
+            "advanced_reports": True,
+            "api_access": True,
+            "support": "Priority"
+        }
+    }
+    return features.get(plan, features["Free"])

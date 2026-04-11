@@ -97,37 +97,50 @@ def main():
     st.markdown("")  # Spacing
     
     try:
-        # ✅ Routing + Restrictions
+        # ✅ Routing + Restrictions based on plan
         if current_page == "Predict":
             render_predict_page(plan=plan)
 
         elif current_page == "Explainability":
-            render_explain_page()
+            # Explainability available on Standard and Premium
+            if plan in ["Standard", "Premium"]:
+                render_explain_page()
+            else:
+                st.warning("🔒 Explainability is available on **Standard** or **Premium** plans.")
+                st.info("Upgrade your plan in **Subscription & Billing** to access detailed explanations.")
 
         elif current_page == "History":
+            # History available on Standard and Premium
             if plan in ["Standard", "Premium"]:
                 render_history_page()
             else:
-                st.warning("🔒 History is available on **Standard** or **Premium** plans.")
-                st.info("Go to **Subscription & Billing** to upgrade.")
+                st.warning("🔒 Prediction History is available on **Standard** or **Premium** plans.")
+                st.info("Upgrade your plan in **Subscription & Billing** to view your prediction history.")
 
         elif current_page == "Admin Dashboard":
-            if role == "Administrator":
+            # Admin Dashboard only for Premium + Administrator role
+            if plan == "Premium" and role == "Administrator":
                 render_admin_dashboard()
-            else:
+            elif role != "Administrator":
                 st.warning("🔒 Admin Dashboard is available only for Administrators.")
                 st.info("Go to **Profile** to change your role to Administrator.")
+            else:
+                st.warning("🔒 Admin Dashboard is available on **Premium** plan.")
+                st.info("Upgrade your plan in **Subscription & Billing** to access admin analytics.")
 
         elif current_page == "Model Performance":
-            if role == "Administrator":
+            # Model Performance only for Premium + Administrator role
+            if plan == "Premium" and role == "Administrator":
                 render_performance_page()
-            else:
+            elif role != "Administrator":
                 st.warning("🔒 Model Performance is available only for Administrators.")
                 st.info("Go to **Profile** to change your role to Administrator.")
+            else:
+                st.warning("🔒 Model Performance is available on **Premium** plan.")
+                st.info("Upgrade your plan in **Subscription & Billing** to access model analytics.")
 
         elif current_page == "Subscription & Billing":
             render_subscription_page()
-            st.info("After selecting a plan, refresh the page or re-open the app if needed.")
 
         elif current_page == "Profile":
             profile()
