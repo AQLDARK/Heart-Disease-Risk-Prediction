@@ -34,6 +34,8 @@ def init_db():
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
             role TEXT NOT NULL DEFAULT 'Patient',
+            profession TEXT,
+            hospital_clinic TEXT,
             created_at TEXT NOT NULL
         )
     """)
@@ -319,4 +321,76 @@ def create_default_admin():
     ))
 
     conn.commit()
+
+
+def update_user_profile(user_id, full_name=None, profession=None, hospital_clinic=None, role=None):
+    """Update user profile information."""
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        
+        updates = []
+        values = []
+        
+        if full_name is not None:
+            updates.append("full_name = ?")
+            values.append(full_name)
+        
+        if profession is not None:
+            updates.append("profession = ?")
+            values.append(profession)
+        
+        if hospital_clinic is not None:
+            updates.append("hospital_clinic = ?")
+            values.append(hospital_clinic)
+        
+        if role is not None:
+            updates.append("role = ?")
+            values.append(role.capitalize())
+        
+        if not updates:
+            return True
+        
+        values.append(user_id)
+        query = f"UPDATE users SET {', '.join(updates)} WHERE id = ?"
+        
+        cur.execute(query, values)
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"User {user_id} profile updated successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Error updating user profile: {str(e)}")
+        raise
+
+
+def get_available_roles():
+    """Get list of available user roles."""
+    return ["Patient", "Doctor", "Researcher", "Admin"]
+
+
+def get_user_by_id(user_id):
+    """Get user information by ID."""
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT id, full_name, email, role, profession, hospital_clinic, created_at FROM users WHERE id = ?", (user_id,))
+        row = cur.fetchone()
+        conn.close()
+        
+        if row:
+            return {
+                "id": row[0],
+                "full_name": row[1],
+                "email": row[2],
+                "role": row[3],
+                "profession": row[4],
+                "hospital_clinic": row[5],
+                "created_at": row[6]
+            }
+        return None
+    except Exception as e:
+        logger.error(f"Error fetching user by ID: {str(e)}")
+        return None
     conn.close()

@@ -13,6 +13,7 @@ from ui.pages.performance import render_performance_page
 from ui.pages.about import render_about_page
 from ui.pages.subscription import render_subscription_page
 from ui.pages.auth import render_auth_page
+from ui.pages.profile import profile
 
 # Setup logging
 setup_logging(log_level=logging.INFO)
@@ -67,11 +68,11 @@ def main():
 
     # ✅ Page list depends on role
     if role == "Patient":
-        pages = ["Predict", "Explainability", "Subscription & Billing", "About"]
+        pages = ["Predict", "Explainability", "Subscription & Billing", "Profile", "About"]
     elif role == "Clinician / Staff":
-        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "About"]
+        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
     else:
-        pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Subscription & Billing", "About"]
+        pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Subscription & Billing", "Profile", "About"]
 
     current_page = st.session_state.get("current_page", "Predict")
     
@@ -123,6 +124,9 @@ def main():
         elif current_page == "Subscription & Billing":
             render_subscription_page()
             st.info("After selecting a plan, refresh the page or re-open the app if needed.")
+
+        elif current_page == "Profile":
+            profile()
 
         elif current_page == "About":
             render_about_page()
