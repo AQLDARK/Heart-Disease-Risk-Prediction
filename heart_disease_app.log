@@ -1,0 +1,37 @@
+2026-04-11 13:36:10 - __main__ - INFO - Application started
+2026-04-11 13:36:22 - __main__ - INFO - Application started
+2026-04-11 13:36:22 - ml.storage - WARNING - Login attempt with non-existent email: aaqilriswan2222@gmail.com
+2026-04-11 13:36:22 - ui.pages.auth - WARNING - Failed login attempt for email: aaqilriswan2222@gmail.com
+2026-04-11 13:36:35 - __main__ - INFO - Application started
+2026-04-11 13:36:35 - ml.storage - ERROR - Password verification failed: Invalid salt
+2026-04-11 13:36:35 - ml.storage - WARNING - Failed login attempt for user: Ahumed1@gmail.com
+2026-04-11 13:36:35 - ui.pages.auth - WARNING - Failed login attempt for email: Ahumed1@gmail.com
+2026-04-11 13:36:38 - __main__ - INFO - Application started
+2026-04-11 13:36:38 - ml.storage - ERROR - Password verification failed: Invalid salt
+2026-04-11 13:36:38 - ml.storage - WARNING - Failed login attempt for user: Ahumed1@gmail.com
+2026-04-11 13:36:38 - ui.pages.auth - WARNING - Failed login attempt for email: Ahumed1@gmail.com
+2026-04-11 13:36:43 - __main__ - INFO - Application started
+2026-04-11 13:36:43 - ml.storage - ERROR - Password verification failed: Invalid salt
+2026-04-11 13:36:43 - ml.storage - WARNING - Failed login attempt for user: Ahumed1@gmail.com
+2026-04-11 13:36:43 - ui.pages.auth - WARNING - Failed login attempt for email: Ahumed1@gmail.com
+2026-04-11 13:37:04 - __main__ - INFO - Application started
+2026-04-11 13:37:04 - ml.storage - WARNING - User creation failed (email exists): suma@.com
+2026-04-11 13:37:04 - ui.pages.auth - WARNING - Signup attempted with existing email: suma@.com
+2026-04-11 13:37:28 - __main__ - INFO - Application started
+2026-04-11 13:37:29 - ml.storage - INFO - User created: saif@.com
+2026-04-11 13:37:29 - ui.pages.auth - INFO - New user created: saif@.com
+2026-04-11 13:37:47 - __main__ - INFO - Application started
+2026-04-11 13:37:47 - ml.storage - INFO - User authenticated: saif@.com
+2026-04-11 13:37:47 - ui.pages.auth - INFO - User logged in: saif@.com
+2026-04-11 13:37:48 - __main__ - INFO - Application started
+2026-04-11 13:37:52 - __main__ - INFO - Application started
+2026-04-11 13:37:56 - __main__ - INFO - Application started
+2026-04-11 13:38:00 - __main__ - INFO - Application started
+2026-04-11 13:38:02 - __main__ - INFO - Application started
+2026-04-11 13:38:03 - __main__ - INFO - Application started
+2026-04-11 13:38:07 - __main__ - INFO - Application started
+2026-04-11 13:38:10 - __main__ - INFO - Application started
+2026-04-11 13:38:12 - __main__ - INFO - Application started
+2026-04-11 13:38:17 - __main__ - INFO - Application started
+2026-04-11 13:38:17 - __main__ - INFO - Application started
+2026-04-11 13:38:26 - __main__ - INFO - Application started
