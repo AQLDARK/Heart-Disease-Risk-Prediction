@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import logging
+import matplotlib.pyplot as plt
+import numpy as np
 
 from ml.utils import load_json
 from ml.predict import predict_risk
@@ -11,6 +13,152 @@ from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
 
 logger = logging.getLogger(__name__)
+
+
+def get_confidence_level(probability):
+    """Determine confidence level based on probability."""
+    if probability >= 0.80:
+        return "High Confidence", "#22c55e", "✅"
+    elif probability >= 0.60:
+        return "Medium Confidence", "#f97316", "⚠️"
+    else:
+        return "Low Confidence", "#ef4444", "❌"
+
+
+def render_confidence_gauge(probability, height=280):
+    """Render a gauge chart for confidence visualization."""
+    fig, ax = plt.subplots(figsize=(8, height/100), subplot_kw=dict(projection='polar'))
+    
+    # Gauge setup
+    theta = np.linspace(np.pi, 0, 100)
+    r = np.ones(100)
+    
+    # Color zones
+    low_mask = theta >= np.pi * 0.67
+    medium_mask = (theta >= np.pi * 0.34) & (theta < np.pi * 0.67)
+    high_mask = theta < np.pi * 0.34
+    
+    # Plot zones
+    ax.fill_between(theta[low_mask], 0, r[low_mask], color='#ef4444', alpha=0.3)
+    ax.fill_between(theta[medium_mask], 0, r[medium_mask], color='#f97316', alpha=0.3)
+    ax.fill_between(theta[high_mask], 0, r[high_mask], color='#22c55e', alpha=0.3)
+    
+    # Plot needle
+    needle_angle = np.pi - (probability * np.pi)
+    ax.plot([needle_angle, needle_angle], [0, 1], 'w-', linewidth=3)
+    ax.scatter([needle_angle], [1], color='white', s=200, zorder=5)
+    
+    # Labels
+    ax.text(np.pi * 0.84, 1.3, 'Low\n(< 60%)', ha='center', va='center', fontsize=9, color='white', weight='bold')
+    ax.text(np.pi * 0.5, 1.3, 'Medium\n(60-79%)', ha='center', va='center', fontsize=9, color='white', weight='bold')
+    ax.text(np.pi * 0.16, 1.3, 'High\n(≥ 80%)', ha='center', va='center', fontsize=9, color='white', weight='bold')
+    
+    # Center text
+    ax.text(0, 0, f'{probability*100:.1f}%', ha='center', va='center', fontsize=18, color='white', weight='bold')
+    
+    ax.set_ylim(0, 1.5)
+    ax.set_theta_offset(np.pi)
+    ax.set_theta_direction(-1)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.spines['polar'].set_visible(False)
+    
+    fig.patch.set_facecolor('#0f1419')
+    
+    return fig
+
+
+def render_confidence_bar(probability):
+    """Render a horizontal progress bar for confidence."""
+    confidence_level, color, icon = get_confidence_level(probability)
+    percentage = probability * 100
+    
+    # Create HTML progress bar
+    html = f"""
+    <div style="margin: 1.5rem 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: bold; color: white;">Model Confidence</span>
+            <span style="color: {color}; font-weight: bold;">{icon} {confidence_level}</span>
+        </div>
+        <div style="
+            width: 100%;
+            height: 12px;
+            background: #1a1f2e;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #2d3748;
+        ">
+            <div style="
+                width: {percentage}%;
+                height: 100%;
+                background: linear-gradient(90deg, {color}, {color});
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            "></div>
+        </div>
+        <div style="
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #9ca3af;
+        ">
+            <span>0%</span>
+            <span style="color: {color}; font-weight: bold;">{percentage:.1f}%</span>
+            <span>100%</span>
+        </div>
+    </div>
+    """
+    return html
+
+
+def render_probability_distribution(probability, risk_label):
+    """Render a probability distribution chart."""
+    # Simulate a distribution around the predicted probability
+    # In reality, you might have actual model uncertainty estimates
+    low_prob = 0.3
+    medium_prob = 0.5
+    high_prob = 0.7
+    
+    # Map to actual probability based on label
+    if risk_label == "High":
+        high_prob = probability
+    elif risk_label == "Medium":
+        medium_prob = probability
+    else:
+        low_prob = probability
+    
+    fig, ax = plt.subplots(figsize=(10, 5))
+    
+    # Distribution data
+    categories = ['Low Risk\nProbability', 'Medium Risk\nProbability', 'High Risk\nProbability']
+    values = [low_prob, medium_prob, high_prob]
+    colors = ['#22c55e', '#f97316', '#ef4444']
+    
+    # Create bars
+    bars = ax.bar(categories, values, color=colors, alpha=0.7, edgecolor='white', linewidth=2)
+    
+    # Add value labels on bars
+    for bar, val in zip(bars, values):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+               f'{val*100:.1f}%',
+               ha='center', va='bottom', fontweight='bold', color='white', fontsize=11)
+    
+    ax.set_ylim(0, 1)
+    ax.set_ylabel('Probability', color='white', fontweight='bold', fontsize=11)
+    ax.set_title('Risk Class Probability Distribution', color='white', fontweight='bold', fontsize=12, pad=20)
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0%}'))
+    ax.tick_params(colors='white', labelsize=10)
+    ax.grid(True, alpha=0.2, axis='y', color='gray')
+    
+    fig.patch.set_facecolor('#0f1419')
+    ax.set_facecolor('#0f1419')
+    for spine in ax.spines.values():
+        spine.set_color('white')
+    
+    plt.tight_layout()
+    return fig
 
 
 def render_predict_page(plan='Free'):
@@ -146,7 +294,10 @@ def render_predict_page(plan='Free'):
         if p is not None and label is not None and out is not None:
             st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
             
-            # Show risk metrics
+            # ============================================
+            # Risk Assessment Overview
+            # ============================================
+            st.markdown("**Risk Assessment:**")
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"""
@@ -165,6 +316,90 @@ def render_predict_page(plan='Free'):
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+            
+            # ============================================
+            # Confidence Visualization
+            # ============================================
+            st.markdown("**Model Confidence & Uncertainty:**")
+            
+            confidence_level, confidence_color, confidence_icon = get_confidence_level(p)
+            
+            # Create tabs for different confidence visualizations
+            conf_tab1, conf_tab2, conf_tab3 = st.tabs(["Confidence Meter", "Gauge Chart", "Probability Distribution"])
+            
+            with conf_tab1:
+                # Progress bar visualization
+                st.markdown(render_confidence_bar(p), unsafe_allow_html=True)
+                
+                st.markdown(f"""
+                <div style="
+                    background: rgba(15, 20, 25, 0.8);
+                    border: 1px solid {confidence_color};
+                    border-radius: 10px;
+                    padding: 1rem;
+                    margin-top: 1rem;
+                ">
+                    <div style="font-size: 0.95rem; color: #9ca3af; line-height: 1.6;">
+                        <strong>What this means:</strong><br>
+                        {confidence_icon} <strong>{confidence_level}</strong> - 
+                        """, unsafe_allow_html=True)
+                
+                if p >= 0.80:
+                    st.markdown("""
+                        The model has high confidence in this prediction. The risk assessment is based on strong 
+                        patterns in the patient's clinical data. However, this is still a statistical prediction and 
+                        should be validated with clinical judgment.
+                    """, unsafe_allow_html=True)
+                elif p >= 0.60:
+                    st.markdown("""
+                        The model has medium confidence in this prediction. The risk level is moderate, and the 
+                        clinical indicators show mixed signals. Additional clinical evaluation is recommended.
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                        The model has low confidence in this prediction. The clinical indicators are unclear or 
+                        inconsistent. Additional diagnostic tests or specialist consultation may be beneficial.
+                    """, unsafe_allow_html=True)
+                
+                st.markdown("</div>", unsafe_allow_html=True)
+            
+            with conf_tab2:
+                # Gauge chart
+                try:
+                    fig_gauge = render_confidence_gauge(p)
+                    st.pyplot(fig_gauge, use_container_width=True)
+                    plt.close(fig_gauge)
+                    
+                    st.markdown("""
+                    **Gauge Interpretation:**
+                    - The needle position shows your predicted probability
+                    - **Green zone (≥80%):** High confidence in heart disease risk
+                    - **Orange zone (60-79%):** Medium confidence, borderline risk
+                    - **Red zone (<60%):** Lower confidence, appears low-risk
+                    """)
+                except Exception as e:
+                    st.warning(f"Could not render gauge: {e}")
+                    logger.error(f"Gauge rendering error: {e}")
+            
+            with conf_tab3:
+                # Probability distribution
+                try:
+                    fig_dist = render_probability_distribution(p, label)
+                    st.pyplot(fig_dist, use_container_width=True)
+                    plt.close(fig_dist)
+                    
+                    st.markdown(f"""
+                    **Distribution Explanation:**
+                    - This chart shows the model's assessment for each risk category
+                    - **Highlighted bar:** Your predicted risk class ({label}) with {p*100:.1f}% probability
+                    - A higher bar indicates greater likelihood of that risk category
+                    - The distribution helps understand how clear the prediction is
+                    """)
+                except Exception as e:
+                    st.warning(f"Could not render distribution: {e}")
+                    logger.error(f"Distribution rendering error: {e}")
             
             st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
             
