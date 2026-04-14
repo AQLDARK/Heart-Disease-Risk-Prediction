@@ -252,4 +252,14 @@ def get_emergency_contact_info():
     }
 
 
+def get_risk_icon(risk_label):
+    """Get icon for risk level."""
+    icons = {
+        "Low": "✅",
+        "Medium": "⚠️",
+        "High": "🚨"
+    }
+    return icons.get(risk_label, "❓")
+
+
 
