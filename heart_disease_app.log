@@ -509,3 +509,19 @@
 2026-04-14 14:01:54 - __main__ - INFO - Application started
 2026-04-14 14:01:55 - ml.storage - INFO - Transaction recorded: 19b68bc8-2a1b-47e3-9cba-062a43e72954 for user 8
 2026-04-14 14:01:56 - __main__ - INFO - Application started
+2026-04-14 14:06:29 - __main__ - INFO - Application started
+2026-04-14 14:07:34 - __main__ - INFO - Application started
+2026-04-14 14:07:34 - ml.storage - INFO - User authenticated: saif@.com
+2026-04-14 14:07:34 - ui.pages.auth - INFO - User logged in: saif@.com
+2026-04-14 14:07:34 - __main__ - INFO - Application started
+2026-04-14 14:08:36 - __main__ - INFO - Application started
+2026-04-14 14:08:36 - ml.predict - INFO - Prediction input validated for features: ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+2026-04-14 14:08:36 - ml.predict - INFO - Prediction successful: proba=0.034, label=Low
+2026-04-14 14:14:42 - __main__ - INFO - Application started
+2026-04-14 14:15:20 - __main__ - INFO - Application started
+2026-04-14 14:15:20 - ml.storage - INFO - User authenticated: saif@.com
+2026-04-14 14:15:20 - ui.pages.auth - INFO - User logged in: saif@.com
+2026-04-14 14:15:21 - __main__ - INFO - Application started
+2026-04-14 14:15:26 - __main__ - INFO - Application started
+2026-04-14 14:15:26 - ml.predict - INFO - Prediction input validated for features: ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+2026-04-14 14:15:26 - ml.predict - INFO - Prediction successful: proba=0.335, label=Low

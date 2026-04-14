@@ -156,6 +156,8 @@ def generate_clinical_recommendations(risk_label, risk_probability, patient_data
     # ============================================
     # Add General Prevention Tips
     # ============================================
+    # Add General Emergency Signs if not already set
+    # ============================================
     
     if not recommendations.get("warning_signs"):
         recommendations["warning_signs"] = [
@@ -230,11 +232,24 @@ def get_risk_color(risk_label):
     return colors.get(risk_label, "#6b7280")
 
 
-def get_risk_icon(risk_label):
-    """Get icon for risk level."""
-    icons = {
-        "Low": "✅",
-        "Medium": "⚠️",
-        "High": "🚨"
+def get_emergency_contact_info():
+    """
+    Get localized emergency contact information.
+    Returns emergency services details for Sri Lanka.
+    """
+    return {
+        "country": "Sri Lanka",
+        "ambulance_number": "1990",
+        "ambulance_service": "Suwa Seriya",
+        "emergency_message": "For medical emergencies, call 1990 (Suwa Seriya - toll-free ambulance service) for fast pre-hospital care and emergency transport.",
+        "emergency_tips": [
+            "Call 1990 immediately - do not delay",
+            "Provide clear location details for faster ambulance dispatch",
+            "Keep the phone line open with the dispatcher",
+            "If possible, have someone wait outside to guide the ambulance",
+            "Never attempt to drive yourself to the hospital in an emergency"
+        ]
     }
-    return icons.get(risk_label, "❓")
+
+
+

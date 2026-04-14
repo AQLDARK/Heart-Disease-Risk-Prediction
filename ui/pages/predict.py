@@ -5,7 +5,7 @@ import logging
 from ml.utils import load_json
 from ml.predict import predict_risk
 from ml.validation import ValidationError
-from ml.recommendations import generate_clinical_recommendations, format_recommendations_for_display, get_risk_color, get_risk_icon
+from ml.recommendations import generate_clinical_recommendations, format_recommendations_for_display, get_risk_color, get_risk_icon, get_emergency_contact_info
 from ui.components import risk_badge, stat_card, card, divider, info_box
 from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
@@ -256,6 +256,9 @@ def render_predict_page(plan='Free'):
                 with rec_tab3:
                     st.markdown("**⚠️ When to Seek Emergency Care**")
                     
+                    # Get Sri Lanka emergency contact info
+                    emergency_info = get_emergency_contact_info()
+                    
                     warning_color = "#ef4444"  # Red
                     st.markdown(f"""
                     <div style="
@@ -265,20 +268,31 @@ def render_predict_page(plan='Free'):
                         padding: 1rem;
                         margin: 1rem 0;
                     ">
-                        <div style="font-weight: bold; color: {warning_color}; margin-bottom: 0.5rem;">
-                            🚑 Call emergency services (911) immediately if you experience:
+                        <div style="font-weight: bold; color: {warning_color}; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                            🚑 {emergency_info['ambulance_number']} - {emergency_info['ambulance_service']} (Toll-free)
+                        </div>
+                        <div style="color: {warning_color}; margin-bottom: 1rem;">
+                            {emergency_info['emergency_message']}
                         </div>
                     """, unsafe_allow_html=True)
                     
+                    st.markdown("**Warning Signs - Call 1990 Immediately:**")
                     if recommendations.get("warning_signs"):
                         for sign in recommendations["warning_signs"]:
                             st.write(f"• {sign}")
                     
                     st.markdown("</div>", unsafe_allow_html=True)
                     
+                    st.divider()
+                    
+                    st.markdown("**Emergency Call Tips for Sri Lanka:**")
+                    for tip in emergency_info['emergency_tips']:
+                        st.write(f"- {tip}")
+                    
                     st.markdown("""
-                    **Time is Critical:** In cardiac emergencies, every minute counts. Do not wait or drive yourself to the hospital if experiencing severe symptoms.
+                    **Time is Critical:** In cardiac emergencies, every minute counts. Do not delay calling 1990. Never attempt to drive yourself to the hospital if experiencing severe symptoms.
                     """)
+
             
             except Exception as e:
                 logger.error(f"Error generating recommendations: {e}")
