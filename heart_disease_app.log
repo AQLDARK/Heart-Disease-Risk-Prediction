@@ -348,3 +348,117 @@
 2026-04-11 21:14:15 - __main__ - INFO - Application started
 2026-04-11 21:14:15 - __main__ - INFO - Application started
 2026-04-11 21:14:15 - __main__ - INFO - Application started
+2026-04-11 21:36:40 - __main__ - INFO - Application started
+2026-04-11 21:36:58 - __main__ - INFO - Application started
+2026-04-11 21:36:59 - ml.storage - INFO - User authenticated: saif@.com
+2026-04-11 21:36:59 - ui.pages.auth - INFO - User logged in: saif@.com
+2026-04-11 21:36:59 - __main__ - INFO - Application started
+2026-04-11 23:54:37 - __main__ - INFO - Application started
+2026-04-11 23:54:50 - __main__ - INFO - Application started
+2026-04-11 23:54:51 - ml.storage - INFO - User authenticated: saif@.com
+2026-04-11 23:54:51 - ui.pages.auth - INFO - User logged in: saif@.com
+2026-04-11 23:54:51 - __main__ - INFO - Application started
+2026-04-11 23:57:36 - __main__ - INFO - Application started
+2026-04-11 23:57:36 - __main__ - INFO - Application started
+2026-04-11 23:58:07 - __main__ - INFO - Application started
+2026-04-11 23:58:07 - ml.storage - INFO - User None profile updated successfully
+2026-04-11 23:58:07 - ml.storage - ERROR - Error fetching user by ID: no such column: profession
+2026-04-11 23:58:07 - __main__ - INFO - Application started
+2026-04-11 23:58:21 - __main__ - INFO - Application started
+2026-04-11 23:58:21 - ml.storage - INFO - User None profile updated successfully
+2026-04-11 23:58:21 - ml.storage - ERROR - Error fetching user by ID: no such column: profession
+2026-04-11 23:58:21 - __main__ - INFO - Application started
+2026-04-11 23:58:58 - __main__ - INFO - Application started
+2026-04-11 23:58:58 - __main__ - INFO - Application started
+2026-04-12 00:00:29 - __main__ - INFO - Application started
+2026-04-12 00:00:29 - __main__ - INFO - Application started
+2026-04-12 00:00:33 - __main__ - INFO - Application started
+2026-04-12 00:00:33 - __main__ - INFO - Application started
+2026-04-12 00:00:58 - __main__ - INFO - Application started
+2026-04-12 00:01:08 - __main__ - INFO - Application started
+2026-04-12 00:01:12 - __main__ - INFO - Application started
+2026-04-12 00:01:28 - __main__ - INFO - Application started
+2026-04-12 00:01:28 - __main__ - INFO - Application started
+2026-04-12 00:01:30 - ml.storage - INFO - Transaction recorded: 70c96eda-ef9d-4296-941f-72d1fbfd4a9e for user 8
+2026-04-12 00:01:30 - __main__ - INFO - Application started
+2026-04-12 00:02:21 - __main__ - INFO - Application started
+2026-04-12 00:03:06 - __main__ - INFO - Application started
+2026-04-12 00:03:06 - __main__ - INFO - Application started
+2026-04-12 00:03:18 - __main__ - INFO - Application started
+2026-04-12 00:03:21 - __main__ - INFO - Application started
+2026-04-12 00:03:23 - __main__ - INFO - Application started
+2026-04-12 00:03:31 - __main__ - INFO - Application started
+2026-04-12 00:03:33 - ml.storage - INFO - Transaction recorded: 49c90089-689f-4e53-9529-925be53179e6 for user 8
+2026-04-12 00:03:33 - __main__ - INFO - Application started
+2026-04-12 00:04:00 - __main__ - INFO - Application started
+2026-04-12 00:04:00 - __main__ - INFO - Application started
+2026-04-12 00:04:13 - __main__ - INFO - Application started
+2026-04-12 00:04:22 - __main__ - INFO - Application started
+2026-04-12 00:04:37 - __main__ - INFO - Application started
+2026-04-12 00:04:49 - __main__ - INFO - Application started
+2026-04-12 00:04:49 - ml.storage - INFO - User None profile updated successfully
+2026-04-12 00:04:49 - ml.storage - ERROR - Error fetching user by ID: no such column: profession
+2026-04-12 00:04:49 - __main__ - INFO - Application started
+2026-04-12 00:04:57 - __main__ - INFO - Application started
+2026-04-12 00:04:58 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:05:21 - __main__ - INFO - Application started
+2026-04-12 00:05:21 - __main__ - INFO - Application started
+2026-04-12 00:05:21 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:05:23 - __main__ - INFO - Application started
+2026-04-12 00:05:23 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:05:39 - __main__ - INFO - Application started
+2026-04-12 00:05:39 - __main__ - INFO - Application started
+2026-04-12 00:05:40 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:05:54 - __main__ - INFO - Application started
+2026-04-12 00:05:55 - __main__ - INFO - Application started
+2026-04-12 00:05:55 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:06:06 - __main__ - INFO - Application started
+2026-04-12 00:06:06 - __main__ - INFO - Application started
+2026-04-12 00:06:06 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:06:08 - __main__ - INFO - Application started
+2026-04-12 00:06:08 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:06:29 - __main__ - INFO - Application started
+2026-04-12 00:06:30 - __main__ - INFO - Application started
+2026-04-12 00:06:30 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:07:00 - __main__ - INFO - Application started
+2026-04-12 00:07:00 - __main__ - INFO - Application started
+2026-04-12 00:07:00 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:07:19 - __main__ - INFO - Application started
+2026-04-12 00:07:19 - ml.storage - INFO - User None profile updated successfully
+2026-04-12 00:07:19 - ml.storage - ERROR - Error fetching user by ID: no such column: profession
+2026-04-12 00:07:19 - __main__ - INFO - Application started
+2026-04-12 00:07:25 - __main__ - INFO - Application started
+2026-04-12 00:07:25 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:07:33 - __main__ - INFO - Application started
+2026-04-12 00:07:34 - __main__ - INFO - Application started
+2026-04-12 00:07:34 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:08:04 - __main__ - INFO - Application started
+2026-04-12 00:08:06 - __main__ - INFO - Application started
+2026-04-12 00:08:06 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:08:18 - __main__ - INFO - Application started
+2026-04-12 00:08:56 - __main__ - INFO - Application started
+2026-04-12 00:08:57 - __main__ - INFO - Application started
+2026-04-12 00:08:57 - ml.storage - ERROR - Error updating user profile: no such column: profession
+2026-04-12 00:09:01 - __main__ - INFO - Application started
+2026-04-12 00:09:01 - __main__ - INFO - Application started
+2026-04-12 00:09:05 - __main__ - INFO - Application started
+2026-04-12 00:09:05 - __main__ - INFO - Application started
+2026-04-12 00:09:57 - __main__ - INFO - Application started
+2026-04-12 00:09:57 - ml.predict - INFO - Prediction input validated for features: ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+2026-04-12 00:09:57 - ml.predict - INFO - Prediction successful: proba=0.860, label=High
+2026-04-12 00:10:15 - __main__ - INFO - Application started
+2026-04-12 00:10:34 - __main__ - INFO - Application started
+2026-04-12 00:10:34 - ml.storage - INFO - Prediction saved: label=High, probability=0.860
+2026-04-12 00:10:34 - ui.pages.predict - INFO - Prediction saved
+2026-04-12 00:10:40 - __main__ - INFO - Application started
+2026-04-12 00:10:40 - __main__ - INFO - Application started
+2026-04-12 00:10:44 - __main__ - INFO - Application started
+2026-04-12 00:10:44 - __main__ - INFO - Application started
+2026-04-12 00:10:51 - __main__ - INFO - Application started
+2026-04-12 00:10:51 - ml.storage - INFO - User None profile updated successfully
+2026-04-12 00:10:51 - ml.storage - ERROR - Error fetching user by ID: no such column: profession
+2026-04-12 00:10:51 - __main__ - INFO - Application started
+2026-04-12 00:10:58 - __main__ - INFO - Application started
+2026-04-12 00:10:58 - __main__ - INFO - Application started
+2026-04-12 00:11:11 - __main__ - INFO - Application started
+2026-04-12 00:11:12 - __main__ - INFO - Application started

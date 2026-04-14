@@ -10,6 +10,7 @@ from ui.pages.explain import render_explain_page
 from ui.pages.history import render_history_page
 from ui.pages.admin_dashboard import render_admin_dashboard
 from ui.pages.performance import render_performance_page
+from ui.pages.model_comparison import render_model_comparison
 from ui.pages.about import render_about_page
 from ui.pages.subscription import render_subscription_page
 from ui.pages.auth import render_auth_page
@@ -71,11 +72,11 @@ def main():
     if role == "Patient":
         pages = ["Predict", "Explainability", "Subscription & Billing", "Profile", "About"]
     elif role == "Clinician / Staff" or role == "Doctor":
-        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
+        pages = ["Predict", "Explainability", "History", "Model Comparison", "Subscription & Billing", "Profile", "About"]
     elif role == "Administrator":
-        pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Subscription & Billing", "Profile", "About"]
+        pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Model Comparison", "Subscription & Billing", "Profile", "About"]
     else:
-        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
+        pages = ["Predict", "Explainability", "History", "Model Comparison", "Subscription & Billing", "Profile", "About"]
 
     current_page = st.session_state.get("current_page", "Predict")
     
@@ -138,6 +139,14 @@ def main():
             else:
                 st.warning("🔒 Model Performance is available on **Premium** plan.")
                 st.info("Upgrade your plan in **Subscription & Billing** to access model analytics.")
+
+        elif current_page == "Model Comparison":
+            # Model Comparison available for Doctor/Researcher/Administrator roles
+            if role in ["Doctor", "Researcher", "Administrator"]:
+                render_model_comparison()
+            else:
+                st.warning("🔒 Model Comparison is available for medical professionals and researchers.")
+                st.info("Go to **Profile** to change your role to access model comparison.")
 
         elif current_page == "Subscription & Billing":
             render_subscription_page()
