@@ -5,6 +5,7 @@ import logging
 from ml.utils import load_json
 from ml.predict import predict_risk
 from ml.validation import ValidationError
+from ml.recommendations import generate_clinical_recommendations, format_recommendations_for_display, get_risk_color, get_risk_icon
 from ui.components import risk_badge, stat_card, card, divider, info_box
 from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
@@ -188,6 +189,112 @@ def render_predict_page(plan='Free'):
                     logger.error(f"Failed to save prediction: {e}")
             
             st.markdown("---")
-            st.markdown("ℹ️ *This is a decision-support tool, not a medical diagnosis.*")
+            
+            # ============================================
+            # Clinical Recommendations Section
+            # ============================================
+            st.markdown("### 💊 Clinical Recommendations")
+            
+            try:
+                # Generate recommendations
+                recommendations = generate_clinical_recommendations(label, p, user_dict)
+                
+                # Create tabs for different aspects of recommendations
+                rec_tab1, rec_tab2, rec_tab3 = st.tabs(["Summary", "Detailed Guidance", "Emergency Signs"])
+                
+                with rec_tab1:
+                    # Risk Summary Card
+                    risk_color = get_risk_color(label)
+                    risk_icon = get_risk_icon(label)
+                    
+                    st.markdown(f"""
+                    <div style="
+                        background: rgba({int(risk_color[1:3], 16)}, {int(risk_color[3:5], 16)}, {int(risk_color[5:7], 16)}, 0.1);
+                        border: 2px solid {risk_color};
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        margin: 1rem 0;
+                    ">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+                            {risk_icon} <strong>Risk Assessment: {label.upper()}</strong>
+                        </div>
+                        <div style="font-size: 1.1rem; color: {risk_color}; margin: 1rem 0;">
+                            Probability: {p*100:.1f}%
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Key Findings
+                    if recommendations.get("key_findings"):
+                        st.markdown("**Key Clinical Findings:**")
+                        for finding in recommendations["key_findings"]:
+                            st.write(finding)
+                    
+                    # Primary Recommendations
+                    if recommendations.get("primary_recommendations"):
+                        st.markdown("**Recommended Actions:**")
+                        for rec in recommendations["primary_recommendations"]:
+                            st.write(rec)
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+                
+                with rec_tab2:
+                    st.markdown("**Lifestyle & Prevention Guidance**")
+                    
+                    # Lifestyle Modifications
+                    if recommendations.get("lifestyle_modifications"):
+                        for mod in recommendations["lifestyle_modifications"]:
+                            st.write(mod)
+                    
+                    st.divider()
+                    
+                    # Monitoring Guidelines
+                    if recommendations.get("monitoring_guidelines"):
+                        st.markdown("**Monitoring & Follow-up:**")
+                        for guideline in recommendations["monitoring_guidelines"]:
+                            st.write(f"- {guideline}")
+                
+                with rec_tab3:
+                    st.markdown("**⚠️ When to Seek Emergency Care**")
+                    
+                    warning_color = "#ef4444"  # Red
+                    st.markdown(f"""
+                    <div style="
+                        background: rgba(239, 68, 68, 0.1);
+                        border-left: 4px solid {warning_color};
+                        border-radius: 8px;
+                        padding: 1rem;
+                        margin: 1rem 0;
+                    ">
+                        <div style="font-weight: bold; color: {warning_color}; margin-bottom: 0.5rem;">
+                            🚑 Call emergency services (911) immediately if you experience:
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if recommendations.get("warning_signs"):
+                        for sign in recommendations["warning_signs"]:
+                            st.write(f"• {sign}")
+                    
+                    st.markdown("</div>", unsafe_allow_html=True)
+                    
+                    st.markdown("""
+                    **Time is Critical:** In cardiac emergencies, every minute counts. Do not wait or drive yourself to the hospital if experiencing severe symptoms.
+                    """)
+            
+            except Exception as e:
+                logger.error(f"Error generating recommendations: {e}")
+                st.warning(f"Could not generate recommendations: {e}")
+            
+            st.markdown("---")
+            st.markdown("""
+            ### ⚕️ Medical Disclaimer
+            
+            **IMPORTANT:** This prediction tool is for educational and decision-support purposes only. It is **NOT** a medical diagnosis or a substitute for professional medical advice, diagnosis, or treatment. 
+            
+            - Always consult with a qualified healthcare provider for medical advice
+            - This tool should be used in conjunction with, not instead of, clinical judgment
+            - Results are based on statistical models and may not apply to all individuals
+            - For medical emergencies, always call emergency services (911)
+            """)
+
         else:
             st.info("👆 Fill the form and click **Predict Risk** to see results.")
