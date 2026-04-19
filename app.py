@@ -70,13 +70,15 @@ def main():
 
     # ✅ Page list depends on role
     if role == "Patient":
-        pages = ["Predict", "Explainability", "Subscription & Billing", "Profile", "About"]
-    elif role == "Clinician / Staff" or role == "Doctor":
-        pages = ["Predict", "Explainability", "History", "Model Comparison", "Subscription & Billing", "Profile", "About"]
-    elif role == "Administrator":
-        pages = ["Predict", "Explainability", "History", "Admin Dashboard", "Model Performance", "Model Comparison", "Subscription & Billing", "Profile", "About"]
+        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About"]
+    elif role == "Doctor":
+        pages = ["Predict", "Explainability", "History", "Subscription & Billing", "Profile", "About", "Model Performance"]
+    elif role == "Researcher":
+        pages = ["Explainability", "Model Performance", "Model Comparison", "Profile", "About"]
+    elif role == "Admin":
+        pages = ["Admin Dashboard", "Model Performance", "Model Comparison", "History", "Profile", "About"]
     else:
-        pages = ["Predict", "Explainability", "History", "Model Comparison", "Subscription & Billing", "Profile", "About"]
+        pages = ["Predict", "Explainability", "History", "Profile", "About"]
 
     current_page = st.session_state.get("current_page", "Predict")
     
@@ -98,55 +100,50 @@ def main():
     st.markdown("")  # Spacing
     
     try:
-        # ✅ Routing + Restrictions based on plan
-        if current_page == "Predict":
+        # ✅ Routing + Role-Based Access Control
+        
+        # Define allowed roles per page
+        role_access = {
+            "Predict": ["Patient", "Doctor"],
+            "Explainability": ["Patient", "Doctor", "Researcher"],
+            "History": ["Patient", "Doctor", "Admin"],
+            "Subscription & Billing": ["Patient", "Doctor"],
+            "Profile": ["Patient", "Doctor", "Researcher", "Admin"],
+            "About": ["Patient", "Doctor", "Researcher", "Admin"],
+            "Model Performance": ["Doctor", "Researcher", "Admin"],
+            "Model Comparison": ["Researcher", "Admin"],
+            "Admin Dashboard": ["Admin"],
+        }
+        
+        # Check access
+        allowed_roles = role_access.get(current_page, [])
+        
+        if current_page not in role_access:
+            st.error(f"❌ **Access Denied** - Page not found: {current_page}")
+            logger.warning(f"User {user.get('email')} attempted to access non-existent page: {current_page}")
+        
+        elif role not in allowed_roles:
+            st.error(f"❌ **Access Denied** - You don't have permission to view this page.")
+            st.info(f"📌 **Your Role:** {role}\n\n**Allowed Roles:** {', '.join(allowed_roles)}")
+            logger.warning(f"Unauthorized access attempt by {user.get('email')} (role: {role}) to page: {current_page}")
+        
+        elif current_page == "Predict":
             render_predict_page(plan=plan)
 
         elif current_page == "Explainability":
-            # Explainability available on Standard and Premium
-            if plan in ["Standard", "Premium"]:
-                render_explain_page()
-            else:
-                st.warning("🔒 Explainability is available on **Standard** or **Premium** plans.")
-                st.info("Upgrade your plan in **Subscription & Billing** to access detailed explanations.")
+            render_explain_page()
 
         elif current_page == "History":
-            # History available on Standard and Premium
-            if plan in ["Standard", "Premium"]:
-                render_history_page()
-            else:
-                st.warning("🔒 Prediction History is available on **Standard** or **Premium** plans.")
-                st.info("Upgrade your plan in **Subscription & Billing** to view your prediction history.")
+            render_history_page(role=role)
 
         elif current_page == "Admin Dashboard":
-            # Admin Dashboard only for Premium + Administrator role
-            if plan == "Premium" and role == "Administrator":
-                render_admin_dashboard()
-            elif role != "Administrator":
-                st.warning("🔒 Admin Dashboard is available only for Administrators.")
-                st.info("Go to **Profile** to change your role to Administrator.")
-            else:
-                st.warning("🔒 Admin Dashboard is available on **Premium** plan.")
-                st.info("Upgrade your plan in **Subscription & Billing** to access admin analytics.")
+            render_admin_dashboard()
 
         elif current_page == "Model Performance":
-            # Model Performance only for Premium + Administrator role
-            if plan == "Premium" and role == "Administrator":
-                render_performance_page()
-            elif role != "Administrator":
-                st.warning("🔒 Model Performance is available only for Administrators.")
-                st.info("Go to **Profile** to change your role to Administrator.")
-            else:
-                st.warning("🔒 Model Performance is available on **Premium** plan.")
-                st.info("Upgrade your plan in **Subscription & Billing** to access model analytics.")
+            render_performance_page()
 
         elif current_page == "Model Comparison":
-            # Model Comparison available for Doctor/Researcher/Administrator roles
-            if role in ["Doctor", "Researcher", "Administrator"]:
-                render_model_comparison()
-            else:
-                st.warning("🔒 Model Comparison is available for medical professionals and researchers.")
-                st.info("Go to **Profile** to change your role to access model comparison.")
+            render_model_comparison()
 
         elif current_page == "Subscription & Billing":
             render_subscription_page()
