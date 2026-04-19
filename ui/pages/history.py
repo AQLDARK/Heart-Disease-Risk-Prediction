@@ -3,8 +3,10 @@ import pandas as pd
 from datetime import date
 
 from ml.storage import load_predictions
+from ui.components import inject_page_background
 
 def render_history_page(role="Patient"):
+    inject_page_background("care")
     st.subheader("Prediction History")
     st.caption("Stored predictions for audit, reporting, and analytics.")
 

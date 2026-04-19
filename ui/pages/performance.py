@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 
 from ml.utils import load_json
+from ui.components import inject_page_background
 
 def render_performance_page():
+    inject_page_background("analytics")
     st.subheader("Model Performance")
 
     metrics = load_json("models/metrics.json")

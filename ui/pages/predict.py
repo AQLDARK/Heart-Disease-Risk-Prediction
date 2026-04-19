@@ -8,14 +8,16 @@ from ml.utils import load_json
 from ml.predict import predict_risk
 from ml.validation import ValidationError
 from ml.recommendations import generate_clinical_recommendations, format_recommendations_for_display, get_risk_color, get_risk_icon, get_emergency_contact_info
-from ui.components import risk_badge, stat_card, card, divider, info_box
+from ui.components import risk_badge, stat_card, card, divider, info_box, inject_page_background
 from ml.storage import save_prediction
 from ml.report import generate_patient_report_pdf
 
 logger = logging.getLogger(__name__)
 
 
-def get_confidence_level(probability):
+def render_predict_page(plan='Free'):
+    # Add premium background
+    inject_page_background("medical")
     """Determine confidence level based on probability."""
     if probability >= 0.80:
         return "High Confidence", "#22c55e", "✅"
@@ -162,6 +164,9 @@ def render_probability_distribution(probability, risk_label):
 
 
 def render_predict_page(plan='Free'):
+    # Add premium background
+    inject_page_background("medical")
+    
     st.markdown("## 🔬 Risk Prediction")
     st.markdown("*Enter patient information to assess heart disease risk*")
 
@@ -542,7 +547,7 @@ def render_predict_page(plan='Free'):
             - Always consult with a qualified healthcare provider for medical advice
             - This tool should be used in conjunction with, not instead of, clinical judgment
             - Results are based on statistical models and may not apply to all individuals
-            - For medical emergencies, always call emergency services (911)
+            - For medical emergencies, always call emergency services (119)
             """)
 
         else:

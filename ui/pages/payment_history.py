@@ -4,13 +4,14 @@ from datetime import date, timedelta
 import logging
 
 from ml.storage import get_all_transactions
-from ui.components import divider, info_box
+from ui.components import divider, info_box, inject_page_background
 
 logger = logging.getLogger(__name__)
 
 
 def render_payment_history_page():
     """Render admin payment history page with filtering by date."""
+    inject_page_background("analytics")
     st.title("💳 Payment History")
     st.markdown("View and manage all system transactions")
     divider()

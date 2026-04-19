@@ -1,10 +1,11 @@
 import streamlit as st
 from ml.storage import get_user_by_id, update_user_profile, get_available_roles
 from ml.validation import validate_email
-from ui.components import card, info_box, divider
+from ui.components import card, info_box, divider, inject_page_background
 
 def profile():
     """User profile and settings page."""
+    inject_page_background("care")
     st.title("👤 User Profile")
     st.markdown("Manage your account settings and preferences")
     divider()

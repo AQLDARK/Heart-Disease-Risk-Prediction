@@ -8,7 +8,7 @@ from ml.storage import (
     get_user_transactions,
     get_plan_features
 )
-from ui.components import card, info_box, divider, stat_card
+from ui.components import card, info_box, divider, stat_card, inject_page_background
 import uuid
 
 
@@ -140,6 +140,8 @@ def generate_invoice_pdf(user, transaction, plan_features):
 
 def render_subscription_page():
     """Enhanced subscription and billing page."""
+    inject_page_background("secure")
+    
     user = st.session_state["user"]
     user_id = user.get("user_id")
     

@@ -3,11 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from ml.utils import load_json
-from ui.components import card, info_box, divider, stat_card
+from ui.components import card, info_box, divider, stat_card, inject_page_background
 
 
 def render_model_comparison():
     """Display model performance comparison dashboard."""
+    inject_page_background("analytics")
     
     st.title("🤖 Model Comparison")
     st.markdown("Compare performance metrics across all trained models")

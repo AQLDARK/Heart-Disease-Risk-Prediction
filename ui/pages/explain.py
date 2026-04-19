@@ -6,8 +6,10 @@ import joblib
 
 from ml.utils import load_json
 from ml.explain import build_explainer, explain_one, top_drivers
+from ui.components import inject_page_background
 
 def render_explain_page():
+    inject_page_background("analytics")
     st.subheader("Explainability")
 
     if "latest_input" not in st.session_state:

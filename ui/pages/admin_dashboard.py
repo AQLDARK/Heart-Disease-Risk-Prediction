@@ -7,11 +7,12 @@ from datetime import datetime, timedelta
 from ml.storage import load_predictions
 from ml.utils import load_json
 from ml.storage import get_subscription
-from ui.components import divider, stat_card
+from ui.components import divider, stat_card, inject_page_background
 
 
 
 def render_admin_dashboard():
+    inject_page_background("analytics")
     st.title("📊 Admin Analytics Dashboard")
     st.markdown("Population-level heart disease risk insights and trend analysis")
     divider()

@@ -1,6 +1,8 @@
 import streamlit as st
+from ui.components import inject_page_background
 
 def render_about_page():
+    inject_page_background("care")
     st.subheader("About")
 
     st.markdown("""

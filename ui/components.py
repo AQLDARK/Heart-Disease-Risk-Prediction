@@ -1,5 +1,88 @@
 import streamlit as st
 
+def inject_premium_background():
+    """Inject premium healthcare background images for all pages."""
+    st.markdown(
+        """
+        <style>
+        /* Premium Healthcare Background */
+        .stApp {
+            background-image: 
+                linear-gradient(135deg, rgba(15, 20, 25, 0.92) 0%, rgba(26, 31, 46, 0.92) 100%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(0,212,255,0.03)" stroke-width="1"/></pattern><pattern id="dots" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="rgba(0,212,255,0.08)"/></pattern></defs><rect width="1200" height="800" fill="url(%23grid)"/><rect width="1200" height="800" fill="url(%23dots)"/></svg>');
+            background-attachment: fixed;
+            background-size: cover, 100px 100px;
+            background-position: center, 0 0;
+            color: #e6e8ee;
+        }
+        
+        /* Medical theme elements */
+        .medical-accent {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .health-gradient {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+def inject_page_background(theme="medical"):
+    """Inject specific page background based on theme type.
+    
+    Args:
+        theme: Type of background - "medical", "analytics", "secure", "care"
+    """
+    backgrounds = {
+        "medical": """
+        <style>
+        .page-container {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 40, 0.95) 100%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="heartbeat" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><path d="M10,100 L50,80 L70,120 L110,40 L150,100 L190,100" stroke="rgba(0,212,255,0.05)" stroke-width="2" fill="none"/></pattern></defs><rect width="1000" height="1000" fill="url(%23heartbeat)"/></svg>');
+            background-attachment: fixed;
+        }
+        </style>
+        """,
+        "analytics": """
+        <style>
+        .page-container {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(25, 35, 50, 0.95) 100%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="analytics" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="2" fill="rgba(0,212,255,0.1)"/><line x1="30" y1="50" x2="80" y2="80" stroke="rgba(34,197,94,0.08)" stroke-width="1"/></pattern></defs><rect width="1000" height="1000" fill="url(%23analytics)"/></svg>');
+            background-attachment: fixed;
+        }
+        </style>
+        """,
+        "secure": """
+        <style>
+        .page-container {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(30, 20, 40, 0.95) 100%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="secure" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50,10 L90,30 L90,60 Q50,85 10,60 L10,30 Z" stroke="rgba(0,212,255,0.08)" fill="none" stroke-width="1.5"/></pattern></defs><rect width="1000" height="1000" fill="url(%23secure)"/></svg>');
+            background-attachment: fixed;
+        }
+        </style>
+        """,
+        "care": """
+        <style>
+        .page-container {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 30, 35, 0.95) 100%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="care" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse"><circle cx="90" cy="90" r="60" stroke="rgba(34,197,94,0.08)" fill="none" stroke-width="1"/><circle cx="90" cy="90" r="40" stroke="rgba(0,212,255,0.08)" fill="none" stroke-width="1"/></pattern></defs><rect width="1000" height="1000" fill="url(%23care)"/></svg>');
+            background-attachment: fixed;
+        }
+        </style>
+        """
+    }
+    
+    selected_bg = backgrounds.get(theme, backgrounds["medical"])
+    st.markdown(selected_bg, unsafe_allow_html=True)
+
+
 def inject_dark_css():
     """Inject modern, attractive dark theme with gradients and animations."""
     st.markdown(
