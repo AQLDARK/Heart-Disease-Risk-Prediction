@@ -160,13 +160,13 @@ def profile():
                 key="role_admin"
             ):
                 try:
-                    update_user_profile(user_id=user.get('id'), role='administrator')
+                    update_user_profile(user_id=user.get('id'), role='Admin')
                     # Fetch updated user data from database
                     updated_user = get_user_by_id(user.get('id'))
                     st.session_state["user"] = {**st.session_state["user"], **updated_user} if updated_user else st.session_state["user"]
-                    st.session_state["role"] = 'Administrator'
-                    st.session_state["current_role"] = 'Administrator'
-                    info_box("✅ Role changed to Administrator", color="success")
+                    st.session_state["role"] = 'Admin'
+                    st.session_state["current_role"] = 'Admin'
+                    info_box("✅ Role changed to Admin", color="success")
                     st.rerun()
                 except Exception as e:
                     info_box(f"Error changing role: {str(e)}", color="error")
@@ -181,7 +181,7 @@ def profile():
             "👨‍⚕️ Doctor": "Access to advanced diagnostics, patient history, and detailed reports. Full feature set for medical professionals.",
             "👤 Patient": "Personal risk assessment, health tracking, and basic health recommendations.",
             "👨‍💻 Researcher": "Advanced analytics, model insights, data export, and research tools.",
-            "🛡️ Administrator": "Full system access, admin dashboard, model performance analytics, and user management."
+            "🛡️ Admin": "Full system access, admin dashboard, model performance analytics, and user management."
         }
         
         for role_name, description in roles_info.items():

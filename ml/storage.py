@@ -311,10 +311,10 @@ def create_default_admin():
             created_at
         ) VALUES (?, ?, ?, ?, ?)
     """, (
-        "System Administrator",
+        "System Admin",
         "admin@system.com",
         password_hash,
-        "Administrator",
+        "Admin",
         datetime.now().isoformat()
     ))
 
@@ -370,8 +370,8 @@ def update_user_profile(user_id, full_name=None, profession=None, hospital_clini
                 values.append('Patient')
             elif role.lower() == 'researcher':
                 values.append('Researcher')
-            elif role.lower() == 'administrator':
-                values.append('Administrator')
+            elif role.lower() == 'admin':
+                values.append('Admin')
             else:
                 values.append(role.capitalize())
         
