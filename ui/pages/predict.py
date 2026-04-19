@@ -15,9 +15,7 @@ from ml.report import generate_patient_report_pdf
 logger = logging.getLogger(__name__)
 
 
-def render_predict_page(plan='Free'):
-    # Add premium background
-    inject_page_background("medical")
+def get_confidence_level(probability):
     """Determine confidence level based on probability."""
     if probability >= 0.80:
         return "High Confidence", "#22c55e", "✅"
