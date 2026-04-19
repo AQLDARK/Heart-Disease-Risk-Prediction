@@ -485,6 +485,56 @@ def get_user_transactions(user_id):
         return []
 
 
+def get_all_transactions(limit=10000):
+    """Get all transactions in the system (for Admin)."""
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT 
+                t.id, 
+                u.full_name, 
+                u.email,
+                t.plan, 
+                t.amount, 
+                t.currency, 
+                t.status, 
+                t.payment_method, 
+                t.transaction_id, 
+                t.created_at, 
+                t.invoice_id
+            FROM transactions t
+            JOIN users u ON t.user_id = u.id
+            ORDER BY t.created_at DESC
+            LIMIT ?
+        """, (limit,))
+        
+        rows = cur.fetchall()
+        conn.close()
+        
+        transactions = []
+        for row in rows:
+            transactions.append({
+                "id": row[0],
+                "user_name": row[1],
+                "user_email": row[2],
+                "plan": row[3],
+                "amount": row[4],
+                "currency": row[5],
+                "status": row[6],
+                "payment_method": row[7],
+                "transaction_id": row[8],
+                "created_at": row[9],
+                "invoice_id": row[10]
+            })
+        
+        return transactions
+    except Exception as e:
+        logger.error(f"Error fetching all transactions: {str(e)}")
+        return []
+
+
 def get_plan_features(plan):
     """Get features available for a given plan."""
     features = {

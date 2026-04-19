@@ -15,6 +15,7 @@ from ui.pages.about import render_about_page
 from ui.pages.subscription import render_subscription_page
 from ui.pages.auth import render_auth_page
 from ui.pages.profile import profile
+from ui.pages.payment_history import render_payment_history_page
 
 # Setup logging
 setup_logging(log_level=logging.INFO)
@@ -76,7 +77,7 @@ def main():
     elif role == "Researcher":
         pages = ["Explainability", "Model Performance", "Model Comparison", "Profile", "About"]
     elif role == "Admin":
-        pages = ["Admin Dashboard", "Model Performance", "Model Comparison", "History", "Profile", "About"]
+        pages = ["Admin Dashboard", "Model Performance", "Model Comparison", "Payment History", "History", "Profile", "About"]
     else:
         pages = ["Predict", "Explainability", "History", "Profile", "About"]
 
@@ -113,6 +114,7 @@ def main():
             "Model Performance": ["Doctor", "Researcher", "Admin"],
             "Model Comparison": ["Researcher", "Admin"],
             "Admin Dashboard": ["Admin"],
+            "Payment History": ["Admin"],
         }
         
         # Check access
@@ -144,6 +146,9 @@ def main():
 
         elif current_page == "Model Comparison":
             render_model_comparison()
+
+        elif current_page == "Payment History":
+            render_payment_history_page()
 
         elif current_page == "Subscription & Billing":
             render_subscription_page()
