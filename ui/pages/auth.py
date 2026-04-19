@@ -32,7 +32,17 @@ def render_auth_page():
 
         with tab_login:
             st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
+            st.markdown("**Select your role to login:**")
             with st.form("login_form", border=True):
+                # Role selection for login
+                role_options = ["Patient", "Doctor", "Researcher", "Admin"]
+                selected_role = st.selectbox(
+                    "👥 Select Role",
+                    role_options,
+                    index=0,
+                    help="Choose your role in the healthcare system"
+                )
+                
                 email = st.text_input("📧 Email", placeholder="your@email.com")
                 password = st.text_input("🔑 Password", type="password", placeholder="••••••••")
                 ok = st.form_submit_button("🚀 Login", use_container_width=True)
@@ -46,9 +56,19 @@ def render_auth_page():
                     validate_email(email)
                     user = authenticate_user(email, password)
                     if user:
+                        # Verify role matches
+                        if user["role"] != selected_role:
+                            info_box(
+                                f"Role mismatch! Your account is registered as '{user['role']}', not '{selected_role}'.",
+                                "warning"
+                            )
+                            logger.warning(f"Login role mismatch for {email}: attempted {selected_role}, actual {user['role']}")
+                            return
+                        
                         st.session_state["auth"] = True
                         st.session_state["user"] = user
-                        logger.info(f"User logged in: {email}")
+                        st.session_state["role"] = selected_role
+                        logger.info(f"User logged in: {email} (Role: {selected_role})")
                         info_box("Login successful! Redirecting...", "success")
                         st.rerun()
                     else:
@@ -62,11 +82,29 @@ def render_auth_page():
 
         with tab_signup:
             st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
+            st.markdown("**Create your account by selecting your role:**")
             with st.form("signup_form", border=True):
                 full_name = st.text_input("👤 Full Name", placeholder="John Doe")
                 email2 = st.text_input("📧 Email", key="signup_email", placeholder="your@email.com")
+                
+                # Enhanced role selection for signup with descriptions
+                role_options = ["Patient", "Doctor", "Researcher", "Admin"]
+                role_descriptions = {
+                    "Patient": "Individual getting health assessment",
+                    "Doctor": "Medical professional providing clinical guidance",
+                    "Researcher": "Healthcare researcher for studies and analysis",
+                    "Admin": "System administrator with full access"
+                }
+                
+                selected_role = st.selectbox(
+                    "👥 Select Your Role",
+                    role_options,
+                    index=0,
+                    help="Choose your role in the healthcare system"
+                )
+                st.caption(f"ℹ️ {role_descriptions[selected_role]}")
+                
                 password2 = st.text_input("🔑 Password", type="password", key="signup_pw", placeholder="••••••••")
-                role = st.selectbox("👨‍⚕️ Role", ["Patient", "Clinician / Staff"], index=0)
                 ok2 = st.form_submit_button("✨ Create Account", use_container_width=True)
 
             if ok2:
@@ -79,13 +117,13 @@ def render_auth_page():
                     validate_password(password2)
                     
                     create_user(
-                        full_name, 
-                        email2, 
-                        password2, 
-                        role="Clinician / Staff" if role.startswith("Clinician") else "Patient"
+                        full_name,
+                        email2,
+                        password2,
+                        role=selected_role
                     )
-                    logger.info(f"New user created: {email2}")
-                    info_box("Account created successfully! You can now login.", "success")
+                    logger.info(f"New user created: {email2} (Role: {selected_role})")
+                    info_box(f"Account created successfully as '{selected_role}'! You can now login.", "success")
                 except ValidationError as e:
                     info_box(str(e), "error")
                 except ValueError as e:
